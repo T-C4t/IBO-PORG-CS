@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="cs" style="height: auto; min-height: 100%;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bezpečně na Netu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        'child': ['Fredoka', 'cursive'],
+                        'adult': ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'kid-primary': '#FFD23F',
+                        'kid-secondary': '#EE4266',
+                        'kid-accent': '#3BCEAC',
+                        'kid-dark': '#0EAD69',
+                        'kid-purple': '#A855F7',
+                        'kid-orange': '#FB923C',
+                        'adult-primary': '#3B82F6',
+                        'adult-secondary': '#64748B',
+                        'adult-accent': '#0F172A',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        [x-cloak] { display: none !important; }
+        
+        @keyframes bounce-in {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(255, 210, 63, 0.5); }
+            50% { box-shadow: 0 0 40px rgba(255, 210, 63, 0.8); }
+        }
+        
+        .animate-bounce-in {
+            animation: bounce-in 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+        
+        .animate-wiggle {
+            animation: wiggle 0.5s ease-in-out;
+        }
+        
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        .animate-pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+        
+        .kid-gradient {
+            background: linear-gradient(135deg, #FFD23F 0%, #FB923C 100%);
+        }
+        
+        .kid-gradient-2 {
+            background: linear-gradient(135deg, #3BCEAC 0%, #0EAD69 100%);
+        }
+        
+        .kid-gradient-3 {
+            background: linear-gradient(135deg, #EE4266 0%, #A855F7 100%);
+        }
+        
+        .kid-card {
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .kid-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 0 rgba(0,0,0,0.15);
+        }
+        
+        .kid-button {
+            border-radius: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .kid-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 rgba(0,0,0,0.25);
+        }
+        
+        .kid-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 2px 0 rgba(0,0,0,0.2);
+        }
+        
+        .star-decoration {
+            position: absolute;
+            font-size: 24px;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-yellow-50 via-pink-50 to-blue-50 text-gray-800 antialiased" style="height: auto; min-height: 100%;">
+
+    <div x-data="app()" class="min-h-[800px] flex flex-col" :class="isChild ? 'font-child' : 'font-adult'">
+
+        <!-- Floating Decorations (Child Mode Only) -->
+        <div x-show="isChild" class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+            <div class="star-decoration animate-float" style="top: 10%; left: 5%;">⭐</div>
+            <div class="star-decoration animate-float" style="top: 20%; right: 10%; animation-delay: 0.5s;">🌟</div>
+            <div class="star-decoration animate-float" style="top: 60%; left: 15%; animation-delay: 1s;">✨</div>
+            <div class="star-decoration animate-float" style="top: 70%; right: 20%; animation-delay: 1.5s;">💫</div>
+            <div class="star-decoration animate-float" style="bottom: 20%; left: 10%; animation-delay: 2s;">🎈</div>
+            <div class="star-decoration animate-float" style="bottom: 30%; right: 15%; animation-delay: 2.5s;">🎨</div>
+        </div>
+
+        <!-- Header -->
+        <header class="w-full p-4 shadow-lg transition-all duration-500 relative z-10"
+                :class="isChild ? 'kid-gradient' : 'bg-white border-b border-gray-200'">
+            <div class="max-w-6xl mx-auto flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold shadow-lg transform hover:rotate-12 transition-transform"
+                         :class="isChild ? 'bg-white text-kid-secondary animate-pulse-glow' : 'bg-adult-primary text-white'">
+                        <span>🛡️</span>
+                    </div>
+                    <div>
+                        <h1 class="text-xl md:text-2xl font-bold tracking-tight" :class="isChild ? 'text-white drop-shadow-md' : ''">Bezpečně na Netu</h1>
+                        <p x-show="isChild" class="text-xs text-white/80 font-medium">Staň se internetovým hrdinou! 🦸</p>
+                    </div>
+                </div>
+                
+                <div x-show="step !== 'age-gate'" x-cloak>
+                    <button @click="resetApp()" class="px-4 py-2 rounded-xl text-sm font-bold transition-all transform hover:scale-105"
+                            :class="isChild ? 'bg-white text-kid-secondary shadow-md hover:shadow-lg' : 'text-gray-600 hover:text-adult-primary'">
+                        🔄 Začít znovu
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 w-full max-w-5xl mx-auto p-4 md:p-8 relative z-10">
+
+            <!-- STEP 0: Age Gate -->
+            <div x-show="step === 'age-gate'" class="flex flex-col items-center justify-center py-12 space-y-8 text-center animate-bounce-in">
+                <div class="max-w-lg space-y-6">
+                    <div class="text-6xl animate-float">🌈</div>
+                    <h2 class="text-4xl md:text-5xl font-bold text-gray-800">Ahoj! 👋</h2>
+                    <p class="text-xl text-gray-600 font-medium">Než začneme, potřebujeme vědět jednu věc...</p>
+                    
+                    <div class="kid-card p-8 md:p-10 animate-bounce-in" style="animation-delay: 0.2s;">
+                        <h3 class="text-2xl md:text-3xl font-bold mb-8 text-gray-800">Jsi mladší 14 let?</h3>
+                        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                            <button @click="setTheme(true)" 
+                                    class="kid-button px-8 py-5 text-xl text-white kid-gradient-3 flex items-center justify-center gap-2">
+                                <span class="text-3xl">😊</span>
+                                <span>ANO, jsem</span>
+                            </button>
+                            <button @click="setTheme(false)" 
+                                    class="kid-button px-8 py-5 text-xl text-white bg-adult-primary hover:bg-blue-700 flex items-center justify-center gap-2">
+                                <span class="text-3xl">👔</span>
+                                <span>NE, nejsem</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 1: Main Menu -->
+            <div x-show="step === 'menu'" x-cloak class="grid md:grid-cols-2 gap-6 py-8">
+                <!-- Task 1 Card -->
+                <div @click="startTask1()" 
+                     class="cursor-pointer group relative overflow-hidden p-8 transition-all animate-bounce-in"
+                     :class="isChild ? 'kid-card kid-gradient-3 text-white' : 'bg-white rounded-2xl shadow-lg border-2 border-gray-200 hover:border-adult-primary'">
+                    
+                    <div x-show="isChild" class="absolute -top-10 -right-10 text-9xl opacity-20 group-hover:opacity-30 transition-opacity transform group-hover:rotate-12">
+                        🎯
+                    </div>
+                    
+                    <div class="relative z-10">
+                        <div class="text-5xl mb-4 animate-float">🎮</div>
+                        <h3 class="text-3xl font-bold mb-3" :class="isChild ? 'text-white' : 'text-adult-primary'">
+                            ÚKOL 1
+                        </h3>
+                        <p class="text-lg mb-2 font-bold" :class="isChild ? 'text-white' : 'text-gray-800'">
+                            Reakce na situace
+                        </p>
+                        <p class="mb-6 opacity-90" :class="isChild ? 'text-white' : 'text-gray-600'">
+                            Otestuj si, jak bys reagoval/a v různých situacích na sociálních sítích!
+                        </p>
+                        <div class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-lg transform group-hover:scale-105 transition-transform"
+                             :class="isChild ? 'bg-white text-kid-secondary shadow-lg' : 'bg-gray-100 text-gray-700'">
+                            <span>Začít hrát</span>
+                            <span class="text-2xl">🚀</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Task 2 Card -->
+                <div @click="startTask2()" 
+                     class="cursor-pointer group relative overflow-hidden p-8 transition-all animate-bounce-in"
+                     style="animation-delay: 0.1s;"
+                     :class="isChild ? 'kid-card kid-gradient-2 text-white' : 'bg-white rounded-2xl shadow-lg border-2 border-gray-200 hover:border-adult-primary'">
+                    
+                    <div x-show="isChild" class="absolute -top-10 -right-10 text-9xl opacity-20 group-hover:opacity-30 transition-opacity transform group-hover:rotate-12">
+                        ⏰
+                    </div>
+                    
+                    <div class="relative z-10">
+                        <div class="text-5xl mb-4 animate-float" style="animation-delay: 0.5s;">📅</div>
+                        <h3 class="text-3xl font-bold mb-3" :class="isChild ? 'text-white' : 'text-adult-primary'">
+                            ÚKOL 2
+                        </h3>
+                        <p class="text-lg mb-2 font-bold" :class="isChild ? 'text-white' : 'text-gray-800'">
+                            Můj Den
+                        </p>
+                        <p class="mb-6 opacity-90" :class="isChild ? 'text-white' : 'text-gray-600'">
+                            Naplánuj si svůj den a zjisti, kolik času trávíš u obrazovek!
+                        </p>
+                        <div class="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-lg transform group-hover:scale-105 transition-transform"
+                             :class="isChild ? 'bg-white text-kid-dark shadow-lg' : 'bg-gray-100 text-gray-700'">
+                            <span>Začít plánovat</span>
+                            <span class="text-2xl">✨</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TASK 1: Scenarios -->
+            <div x-show="step === 'task1'" x-cloak class="max-w-3xl mx-auto py-6">
+                <div class="mb-6 flex justify-between items-center">
+                    <button @click="step = 'menu'" class="text-sm font-bold hover:underline flex items-center gap-2"
+                            :class="isChild ? 'text-kid-secondary' : 'text-gray-500'">
+                        <span class="text-xl">👈</span>
+                        <span>Zpět do menu</span>
+                    </button>
+                    <div class="flex items-center gap-2 px-4 py-2 rounded-full font-bold shadow-md"
+                         :class="isChild ? 'bg-white text-kid-secondary' : 'bg-gray-100'">
+                        <span class="text-xl">🎯</span>
+                        <span>Otázka <span x-text="currentScenarioIndex + 1"></span> / <span x-text="scenarios.length"></span></span>
+                    </div>
+                </div>
+
+                <div class="overflow-hidden transition-all animate-bounce-in"
+                     :class="isChild ? 'kid-card' : 'bg-white rounded-2xl shadow-lg border-2 border-gray-200'">
+                    
+                    <!-- Question Area -->
+                    <div class="p-8 relative overflow-hidden"
+                         :class="isChild ? 'kid-gradient' : 'bg-gray-50'">
+                        <div x-show="isChild" class="absolute top-4 right-4 text-6xl opacity-20 animate-wiggle">
+                            🤔
+                        </div>
+                        <h3 class="text-2xl md:text-3xl font-bold mb-4 relative z-10" 
+                            :class="isChild ? 'text-white drop-shadow-md' : 'text-gray-800'"
+                            x-text="scenarios[currentScenarioIndex].title"></h3>
+                        <p class="text-lg md:text-xl leading-relaxed relative z-10" 
+                           :class="isChild ? 'text-white/95 font-medium' : 'text-gray-700'"
+                           x-text="scenarios[currentScenarioIndex].description"></p>
+                    </div>
+
+                    <!-- Options Area -->
+                    <div class="p-8 space-y-4">
+                        <template x-for="(option, index) in scenarios[currentScenarioIndex].options" :key="index">
+                            <button @click="selectOption(option)"
+                                    class="w-full text-left p-5 rounded-2xl border-3 transition-all flex items-center justify-between group relative overflow-hidden"
+                                    :class="isChild 
+                                        ? 'border-gray-200 hover:border-kid-secondary bg-white hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 shadow-md hover:shadow-xl transform hover:scale-105' 
+                                        : 'border-gray-200 hover:border-adult-primary hover:bg-blue-50'">
+                                <span class="font-bold text-lg relative z-10" x-text="option.text"></span>
+                                <span class="text-3xl opacity-0 group-hover:opacity-100 transition-all transform group-hover:scale-125 relative z-10">
+                                    👉
+                                </span>
+                                <div x-show="isChild" class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
+                            </button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Feedback Modal -->
+                <div x-show="showFeedback" 
+                     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md"
+                     x-transition.opacity>
+                    <div class="max-w-md w-full p-10 text-center transform transition-all animate-bounce-in"
+                         :class="isChild ? 'kid-card' : 'bg-white rounded-3xl shadow-2xl'"
+                         @click.away="nextScenario()">
+                        
+                        <div class="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center text-5xl shadow-lg animate-wiggle"
+                             :class="{
+                                'bg-gradient-to-br from-green-400 to-green-600': feedbackType === 'ideal',
+                                'bg-gradient-to-br from-yellow-400 to-orange-500': feedbackType === 'ok',
+                                'bg-gradient-to-br from-red-400 to-pink-600': feedbackType === 'bad'
+                             }">
+                            <span x-show="feedbackType === 'ideal'">🌟</span>
+                            <span x-show="feedbackType === 'ok'">🤔</span>
+                            <span x-show="feedbackType === 'bad'">⚠️</span>
+                        </div>
+
+                        <h3 class="text-3xl font-bold mb-3" 
+                            :class="isChild ? 'text-gray-800' : 'text-gray-800'"
+                            x-text="feedbackTitle"></h3>
+                        <p class="text-lg text-gray-600 mb-6 font-medium" x-text="feedbackMessage"></p>
+
+                        <!-- Show correct answer if not ideal -->
+                        <div x-show="feedbackType !== 'ideal'" class="mb-8 p-5 rounded-2xl text-left"
+                             :class="isChild ? 'bg-gradient-to-r from-green-50 to-emerald-50 border-2 border-green-300' : 'bg-green-50 border-2 border-green-300'">
+                            <div class="flex items-start gap-3">
+                                <span class="text-3xl">💡</span>
+                                <div>
+                                    <p class="font-bold text-green-800 mb-2">Ideální řešení by bylo:</p>
+                                    <p class="text-green-700 font-medium" x-text="correctAnswer"></p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button @click="nextScenario()" 
+                                class="w-full py-4 rounded-2xl font-bold text-white text-lg transition-all transform hover:scale-105"
+                                :class="isChild ? 'kid-button kid-gradient-3 shadow-lg' : 'bg-adult-primary hover:bg-blue-700'">
+                            <span x-show="currentScenarioIndex < scenarios.length - 1">Další otázka 🚀</span>
+                            <span x-show="currentScenarioIndex >= scenarios.length - 1">Zobrazit výsledky 🏆</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TASK 1: Results -->
+            <div x-show="step === 'task1-results'" x-cloak class="max-w-3xl mx-auto py-8 text-center animate-bounce-in">
+                <div class="p-10" :class="isChild ? 'kid-card' : 'bg-white rounded-3xl shadow-xl border-2 border-gray-200'">
+                    <div class="text-8xl mb-6 animate-float">🏆</div>
+                    <h2 class="text-4xl md:text-5xl font-bold mb-4" :class="isChild ? 'text-kid-secondary' : 'text-gray-800'">
+                        Skvělá práce!
+                    </h2>
+                    <p class="text-xl text-gray-600 mb-10 font-medium">
+                        Prošel/a jsi všechny situace. Tady je tvůj přehled:
+                    </p>
+
+                    <div class="space-y-4 mb-10 text-left">
+                        <template x-for="(result, index) in task1Results" :key="index">
+                            <div class="p-5 rounded-2xl transition-all hover:scale-105"
+                                 :class="isChild ? 'bg-gradient-to-r from-yellow-50 to-pink-50 border-2 border-yellow-200' : 'bg-gray-50 border border-gray-200'">
+                                <div class="flex items-start gap-4 mb-3">
+                                    <div class="mt-1 text-3xl">
+                                        <span x-show="result.type === 'ideal'">✅</span>
+                                        <span x-show="result.type === 'ok'">⚠️</span>
+                                        <span x-show="result.type === 'bad'">❌</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <h4 class="font-bold text-lg mb-1" :class="isChild ? 'text-kid-secondary' : 'text-gray-800'">
+                                            <span x-text="'Situace ' + (index + 1)"></span>
+                                        </h4>
+                                        <p class="text-gray-600 font-medium mb-2" x-text="result.feedback"></p>
+                                    </div>
+                                </div>
+                                <!-- Show correct answer in summary too -->
+                                <div x-show="result.type !== 'ideal'" class="ml-14 p-3 rounded-xl bg-green-50 border border-green-200">
+                                    <p class="text-sm text-green-700 font-medium">
+                                        <span class="font-bold">✓ Správně:</span> <span x-text="result.correctAnswer"></span>
+                                    </p>
+                                </div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <button @click="step = 'menu'" 
+                            class="px-10 py-4 rounded-2xl font-bold text-white text-lg transition-all transform hover:scale-105"
+                            :class="isChild ? 'kid-button kid-gradient shadow-lg' : 'bg-adult-secondary hover:bg-gray-600'">
+                        🏠 Zpět do menu
+                    </button>
+                </div>
+            </div>
+
+            <!-- TASK 2: Day Planner -->
+            <div x-show="step === 'task2'" x-cloak class="py-4">
+                <div class="mb-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <button @click="step = 'menu'" class="text-sm font-bold hover:underline flex items-center gap-2"
+                            :class="isChild ? 'text-kid-secondary' : 'text-gray-500'">
+                        <span class="text-xl">👈</span>
+                        <span>Zpět do menu</span>
+                    </button>
+                    <div class="flex gap-2">
+                        <button @click="dayType = 'weekday'; resetGrid()" 
+                                class="px-5 py-3 rounded-xl text-sm font-bold transition-all transform hover:scale-105 flex items-center gap-2"
+                                :class="dayType === 'weekday' 
+                                    ? (isChild ? 'kid-button kid-gradient-2 text-white shadow-lg' : 'bg-adult-primary text-white') 
+                                    : 'bg-white text-gray-600 border-2 border-gray-200'">
+                            <span class="text-lg">📚</span>
+                            <span>Všední den</span>
+                        </button>
+                        <button @click="dayType = 'weekend'; resetGrid()" 
+                                class="px-5 py-3 rounded-xl text-sm font-bold transition-all transform hover:scale-105 flex items-center gap-2"
+                                :class="dayType === 'weekend' 
+                                    ? (isChild ? 'kid-button kid-gradient-2 text-white shadow-lg' : 'bg-adult-primary text-white') 
+                                    : 'bg-white text-gray-600 border-2 border-gray-200'">
+                            <span class="text-lg">🎉</span>
+                            <span>Víkend</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid lg:grid-cols-12 gap-6">
+                    <!-- Sidebar: Activity Palette -->
+                    <div class="lg:col-span-4 space-y-6">
+                        <div class="p-6 rounded-3xl" :class="isChild ? 'kid-card' : 'bg-white shadow-lg border border-gray-200'">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="text-2xl">🎨</span>
+                                <h3 class="font-bold text-xl">1. Vyber aktivitu</h3>
+                            </div>
+                            
+                            <!-- Mandatory -->
+                            <div class="mb-6">
+                                <p class="text-xs font-bold uppercase tracking-wider mb-3 flex items-center gap-2"
+                                   :class="isChild ? 'text-kid-secondary' : 'text-gray-400'">
+                                    <span>⭐</span>
+                                    <span>Povinné</span>
+                                </p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <template x-for="act in activities.mandatory" :key="act.id">
+                                        <button @click="selectedActivity = act"
+                                                class="p-3 rounded-xl text-sm font-bold text-left flex flex-col items-center gap-2 transition-all border-3 transform hover:scale-105"
+                                                :class="selectedActivity.id === act.id 
+                                                    ? 'border-gray-800 ring-4 ring-yellow-200 shadow-lg scale-105' 
+                                                    : 'border-transparent hover:border-gray-300 shadow-md'"
+                                                :style="`background: linear-gradient(135deg, ${act.color} 0%, ${act.darkColor} 100%); color: white;`">
+                                            <span class="text-3xl" x-text="act.icon"></span>
+                                            <span class="text-xs text-center" x-text="act.name"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Optional -->
+                            <div :class="{'opacity-50 pointer-events-none': !mandatoryComplete}">
+                                <p class="text-xs font-bold uppercase tracking-wider mb-3 flex items-center justify-between"
+                                   :class="isChild ? 'text-kid-dark' : 'text-gray-400'">
+                                    <span class="flex items-center gap-2">
+                                        <span>✨</span>
+                                        <span>Volitelné</span>
+                                    </span>
+                                    <span x-show="!mandatoryComplete" class="text-red-500 text-[10px] normal-case">
+                                        Vyplň nejdřív povinné!
+                                    </span>
+                                </p>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <template x-for="act in activities.optional" :key="act.id">
+                                        <button @click="selectedActivity = act"
+                                                class="p-3 rounded-xl text-sm font-bold text-left flex flex-col items-center gap-2 transition-all border-3 transform hover:scale-105"
+                                                :class="selectedActivity.id === act.id 
+                                                    ? 'border-gray-800 ring-4 ring-yellow-200 shadow-lg scale-105' 
+                                                    : 'border-transparent hover:border-gray-300 shadow-md'"
+                                                :style="`background: linear-gradient(135deg, ${act.color} 0%, ${act.darkColor} 100%); color: white;`">
+                                            <span class="text-3xl" x-text="act.icon"></span>
+                                            <span class="text-xs text-center" x-text="act.name"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Stats Card -->
+                        <div class="p-6 rounded-3xl" :class="isChild ? 'kid-card kid-gradient-3 text-white' : 'bg-white shadow-lg border border-gray-200'">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="text-2xl">📊</span>
+                                <h3 class="font-bold text-xl">Statistika</h3>
+                            </div>
+                            <div class="flex justify-between items-center mb-3">
+                                <span class="font-medium" :class="isChild ? 'text-white/90' : 'text-gray-600'">
+                                    Čas u obrazovek:
+                                </span>
+                                <span class="font-bold text-2xl" 
+                                      :class="screenTimeHours > recommendedMax ? 'text-yellow-300' : (isChild ? 'text-white' : 'text-green-600')"
+                                      x-text="formatTime(screenTimeBlocks)"></span>
+                            </div>
+                            <div class="w-full rounded-full h-4 mb-6 overflow-hidden"
+                                 :class="isChild ? 'bg-white/30' : 'bg-gray-100'">
+                                <div class="h-4 rounded-full transition-all duration-500" 
+                                     :class="screenTimeHours > recommendedMax ? 'bg-yellow-300' : 'bg-green-400'"
+                                     :style="`width: ${Math.min((screenTimeBlocks / 48) * 100, 100)}%`"></div>
+                            </div>
+                            
+                            <button @click="finishTask2()" 
+                                    :disabled="!isGridFull"
+                                    class="w-full py-4 rounded-2xl font-bold text-lg transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center gap-2"
+                                    :class="isChild ? 'kid-button bg-white text-kid-dark shadow-lg' : 'bg-adult-primary text-white hover:bg-blue-700'">
+                                <span>Vyhodnotit den</span>
+                                <span class="text-2xl">🎯</span>
+                            </button>
+                            <p x-show="!isGridFull" class="text-xs text-center mt-3" :class="isChild ? 'text-white/80' : 'text-gray-400'">
+                                Vyplň celý den (všechna políčka)
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Main Grid Area -->
+                    <div class="lg:col-span-8">
+                        <div class="p-6 rounded-3xl" :class="isChild ? 'kid-card' : 'bg-white shadow-lg border border-gray-200'">
+                            <div class="flex items-center gap-2 mb-4">
+                                <span class="text-2xl">🖱️</span>
+                                <h3 class="font-bold text-xl">2. Klikni do rozvrhu</h3>
+                                <span class="text-sm font-medium text-gray-500">(1 dílek = 30 min)</span>
+                            </div>
+                            
+                            <!-- The Grid -->
+                            <div class="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2 select-none">
+                                <template x-for="(block, index) in timeGrid" :key="index">
+                                    <div @click="paintBlock(index)"
+                                         @mouseenter="isDragging ? paintBlock(index) : null"
+                                         @mousedown="isDragging = true"
+                                         @mouseup="isDragging = false"
+                                         class="aspect-square rounded-xl border-3 flex items-center justify-center text-xs cursor-pointer transition-all relative group overflow-hidden transform hover:scale-110"
+                                         :class="block.activityId ? 'shadow-md hover:shadow-lg' : 'border-dashed'"
+                                         :style="`background-color: ${block.color || '#f9fafb'}; border-color: ${block.color || '#e5e7eb'}`">
+                                        
+                                        <!-- Time Label -->
+                                        <span class="absolute top-0.5 left-1 text-[9px] font-bold text-gray-400 pointer-events-none" 
+                                              x-text="getTimeLabel(index)"></span>
+                                        
+                                        <!-- Icon -->
+                                        <span x-show="block.activityId" class="text-2xl pointer-events-none transform group-hover:scale-125 transition-transform" x-text="getActivityIcon(block.activityId)"></span>
+                                        
+                                        <!-- Hover effect -->
+                                        <div class="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 pointer-events-none rounded-xl"></div>
+                                    </div>
+                                </template>
+                            </div>
+                            <div class="mt-4 p-4 rounded-xl flex items-center gap-3"
+                                 :class="isChild ? 'bg-gradient-to-r from-yellow-50 to-pink-50' : 'bg-gray-50'">
+                                <span class="text-2xl">💡</span>
+                                <p class="text-sm font-medium text-gray-600">
+                                    <strong>Tip:</strong> Můžeš klikat nebo táhnout myší pro rychlejší vyplnění!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TASK 2: Results -->
+            <div x-show="step === 'task2-results'" x-cloak class="max-w-3xl mx-auto py-8 animate-bounce-in">
+                <div class="p-10 rounded-3xl" :class="isChild ? 'kid-card' : 'bg-white shadow-xl border-2 border-gray-200'">
+                    <div class="text-center mb-8">
+                        <div class="text-7xl mb-4 animate-float">📊</div>
+                        <h2 class="text-4xl font-bold mb-2" :class="isChild ? 'text-kid-secondary' : 'text-gray-800'">
+                            Vyhodnocení dne
+                        </h2>
+                    </div>
+                    
+                    <div class="p-8 rounded-2xl mb-8"
+                         :class="isChild ? 'bg-gradient-to-br from-yellow-50 to-pink-50 border-3 border-yellow-200' : 'bg-gray-50'">
+                        <div class="flex flex-col sm:flex-row justify-between items-center gap-6 mb-6">
+                            <div class="text-center sm:text-left">
+                                <p class="text-gray-500 text-sm font-bold mb-2 flex items-center gap-2 justify-center sm:justify-start">
+                                    <span>📱</span>
+                                    <span>Tvůj čas u obrazovek</span>
+                                </p>
+                                <p class="text-5xl font-bold" :class="isChild ? 'text-kid-secondary' : 'text-gray-800'" x-text="formatTime(screenTimeBlocks)"></p>
+                            </div>
+                            <div class="text-center sm:text-right">
+                                <p class="text-gray-500 text-sm font-bold mb-2 flex items-center gap-2 justify-center sm:justify-end">
+                                    <span>✅</span>
+                                    <span>Doporučeno (11-14 let)</span>
+                                </p>
+                                <p class="text-3xl font-bold text-gray-600">max 2:00 h</p>
+                            </div>
+                        </div>
+
+                        <div class="p-6 rounded-xl border-l-4 flex items-start gap-4" 
+                             :class="screenTimeHours <= recommendedMax 
+                                ? 'bg-green-50 border-green-500' 
+                                : 'bg-red-50 border-red-500'">
+                            <span class="text-4xl">
+                                <span x-show="screenTimeHours <= recommendedMax">🎉</span>
+                                <span x-show="screenTimeHours > recommendedMax">⚠️</span>
+                            </span>
+                            <p class="font-bold text-lg" x-text="screenTimeHours <= recommendedMax 
+                                ? 'Výborně! Tvůj čas u obrazovek je v normě. Máš dostatek času na ostatní aktivity! 🌟' 
+                                : 'Pozor! Trávíš u obrazovek více času, než je zdrávo. Zkus nahradit část tohoto času pohybem nebo čtením. 💪'">
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mb-8">
+                        <h3 class="font-bold text-xl flex items-center gap-2">
+                            <span>📈</span>
+                            <span>Rozložení tvého dne:</span>
+                        </h3>
+                        <template x-for="stat in getStats()" :key="stat.name">
+                            <div class="flex items-center gap-4 text-sm p-3 rounded-xl transition-all hover:scale-105"
+                                 :class="isChild ? 'bg-white shadow-sm' : 'bg-gray-50'">
+                                <span class="w-28 font-bold truncate" x-text="stat.name"></span>
+                                <div class="flex-1 h-6 bg-gray-100 rounded-full overflow-hidden shadow-inner">
+                                    <div class="h-full rounded-full transition-all duration-1000" 
+                                         :style="`width: ${stat.percent}%; background: linear-gradient(90deg, ${stat.color}, ${stat.darkColor || stat.color})`"></div>
+                                </div>
+                                <span class="w-20 text-right font-bold font-mono" x-text="stat.time"></span>
+                            </div>
+                        </template>
+                    </div>
+
+                    <div class="text-center">
+                        <button @click="step = 'menu'" 
+                                class="px-10 py-4 rounded-2xl font-bold text-white text-lg transition-all transform hover:scale-105 flex items-center justify-center gap-2 mx-auto"
+                                :class="isChild ? 'kid-button kid-gradient shadow-lg' : 'bg-adult-secondary hover:bg-gray-600'">
+                            <span>🏠</span>
+                            <span>Zpět do menu</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="p-6 text-center text-gray-400 text-sm relative z-10">
+            <p class="font-medium">&copy; 2024 Knihovna - Vzdělávací workshop</p>
+            <p class="text-xs mt-1">Vytvořeno s ❤️ pro bezpečný internet</p>
+        </footer>
+
+    </div>
+
+    <script>
+        function app() {
+            return {
+                step: 'age-gate',
+                isChild: true,
+                
+                currentScenarioIndex: 0,
+                showFeedback: false,
+                feedbackType: '',
+                feedbackTitle: '',
+                feedbackMessage: '',
+                correctAnswer: '',
+                task1Results: [],
+                scenarios: [
+                    {
+                        title: "Situace 1: Kyberšikana",
+                        description: "Někdo ti pod fotku na Instagramu napíše ošklivý komentář, že vypadáš hrozně. Co uděláš?",
+                        options: [
+                            { text: "Napíšu mu zpátky něco ještě horšího.", type: "bad", feedback: "Oplácení jen zvyšuje agresivitu. Není to řešení." },
+                            { text: "Smažu komentář a budu dělat, že se nic nestalo.", type: "ok", feedback: "To je v pořádku, ale útočník může napsat znovu." },
+                            { text: "Komentář nahlásím, uživatele zablokuji a řeknu to rodičům.", type: "ideal", feedback: "Skvělé! Blokace a nahlášení je nejlepší obrana." }
+                        ]
+                    },
+                    {
+                        title: "Situace 2: Cizí člověk",
+                        description: "Na Facebooku ti přijde žádost o přátelství od dospělého, kterého neznáš, ale máte jednoho společného přítele.",
+                        options: [
+                            { text: "Přijmu ho, když máme společného přítele, je to asi OK.", type: "bad", feedback: "Společný přítel neznamená bezpečí. Nikdy nepřidávej cizí lidi." },
+                            { text: "Napíšu společnému příteli, kdo to je.", type: "ok", feedback: "Dobrý nápad, ale bezpečnější je cizí lidi rovnou ignorovat." },
+                            { text: "Žádost odmítnu a zablokuji.", type: "ideal", feedback: "Výborně. Na sociálních sítích měj jen lidi, které znáš osobně." }
+                        ]
+                    },
+                    {
+                        title: "Situace 3: Heslo",
+                        description: "Kamarád chce půjčit tvůj mobil, aby se podíval na TikTok, ale chce znát tvé heslo.",
+                        options: [
+                            { text: "Řeknu mu heslo, je to nejlepší kámoš.", type: "bad", feedback: "Heslo je jako kartáček na zuby - nikomu se nepůjčuje!" },
+                            { text: "Odemknu mu mobil sám, ale z ruky ho nedám.", type: "ok", feedback: "Lepší, ale stále riskuješ, že uvidí něco soukromého." },
+                            { text: "Odemknu mu mobil a jsem u toho s ním.", type: "ideal", feedback: "Správně. Máš kontrolu nad svým zařízením." }
+                        ]
+                    }
+                ],
+
+                dayType: 'weekday',
+                timeGrid: Array(48).fill().map(() => ({ activityId: null, color: null })),
+                selectedActivity: { id: 'sleep', name: 'Spánek', color: '#93C5FD', darkColor: '#1E3A8A', type: 'mandatory', icon: '😴' },
+                isDragging: false,
+                recommendedMax: 2,
+                
+                activities: {
+                    mandatory: [
+                        { id: 'sleep', name: 'Spánek', color: '#93C5FD', darkColor: '#1E3A8A', icon: '😴' },
+                        { id: 'food', name: 'Jídlo', color: '#FCA5A5', darkColor: '#7F1D1D', icon: '🍔' },
+                        { id: 'school', name: 'Škola/Práce', color: '#FDBA74', darkColor: '#7C2D12', icon: '🏫' },
+                        { id: 'hygiene', name: 'Hygiena', color: '#6EE7B7', darkColor: '#064E3B', icon: '🚿' }
+                    ],
+                    optional: [
+                        { id: 'movement', name: 'Pohyb', color: '#86EFAC', darkColor: '#14532D', icon: '⚽' },
+                        { id: 'creative', name: 'Tvoření', color: '#D8B4FE', darkColor: '#581C87', icon: '🎨' },
+                        { id: 'talk', name: 'Povídání', color: '#F0ABFC', darkColor: '#701A75', icon: '🗣️' },
+                        { id: 'rest', name: 'Odpočinek', color: '#CBD5E1', darkColor: '#334155', icon: '🧘' },
+                        { id: 'screen', name: 'Obrazovky', color: '#F87171', darkColor: '#7F1D1D', icon: '📱' },
+                        { id: 'read', name: 'Čtení', color: '#FEF08A', darkColor: '#713F12', icon: '📖' },
+                        { id: 'travel', name: 'Cestování', color: '#A5F3FC', darkColor: '#164E63', icon: '🚌' },
+                        { id: 'other', name: 'Jiné', color: '#E5E7EB', darkColor: '#374151', icon: '✨' }
+                    ]
+                },
+
+                get mandatoryComplete() {
+                    const usedIds = new Set(this.timeGrid.map(b => b.activityId));
+                    return this.activities.mandatory.every(a => usedIds.has(a.id));
+                },
+                
+                get isGridFull() {
+                    return this.timeGrid.every(b => b.activityId !== null);
+                },
+
+                get screenTimeBlocks() {
+                    return this.timeGrid.filter(b => b.activityId === 'screen').length;
+                },
+
+                get screenTimeHours() {
+                    return this.screenTimeBlocks * 0.5;
+                },
+
+                setTheme(isChild) {
+                    this.isChild = isChild;
+                    this.step = 'menu';
+                },
+
+                resetApp() {
+                    this.step = 'age-gate';
+                    this.currentScenarioIndex = 0;
+                    this.task1Results = [];
+                    this.resetGrid();
+                },
+
+                startTask1() {
+                    this.currentScenarioIndex = 0;
+                    this.task1Results = [];
+                    this.step = 'task1';
+                },
+
+                selectOption(option) {
+                    this.feedbackType = option.type;
+                    this.feedbackMessage = option.feedback;
+                    
+                    if (option.type === 'ideal') {
+                        this.feedbackTitle = "Výborně! Ideální řešení.";
+                        this.correctAnswer = '';
+                    } else {
+                        if (option.type === 'ok') this.feedbackTitle = "OK, ale jde to lépe.";
+                        else this.feedbackTitle = "Pozor! Nevhodné řešení.";
+                        
+                        // Find the ideal answer
+                        const idealOption = this.scenarios[this.currentScenarioIndex].options.find(o => o.type === 'ideal');
+                        this.correctAnswer = idealOption ? idealOption.text : '';
+                    }
+
+                    this.task1Results.push({
+                        scenarioIndex: this.currentScenarioIndex,
+                        type: option.type,
+                        feedback: option.feedback,
+                        correctAnswer: this.correctAnswer
+                    });
+
+                    this.showFeedback = true;
+                },
+
+                nextScenario() {
+                    this.showFeedback = false;
+                    if (this.currentScenarioIndex < this.scenarios.length - 1) {
+                        this.currentScenarioIndex++;
+                    } else {
+                        this.step = 'task1-results';
+                    }
+                },
+
+                startTask2() {
+                    this.resetGrid();
+                    this.step = 'task2';
+                },
+
+                resetGrid() {
+                    this.timeGrid = Array(48).fill().map(() => ({ activityId: null, color: null }));
+                    this.selectedActivity = this.activities.mandatory[0];
+                },
+
+                paintBlock(index) {
+                    const isOptional = this.activities.optional.find(a => a.id === this.selectedActivity.id);
+                    if (isOptional && !this.mandatoryComplete) {
+                        alert("Nejdříve vyplň alespoň jeden dílek od každé povinné aktivity (Spánek, Jídlo, Škola, Hygiena)!");
+                        return;
+                    }
+
+                    this.timeGrid[index] = {
+                        activityId: this.selectedActivity.id,
+                        color: this.selectedActivity.color
+                    };
+                },
+
+                getTimeLabel(index) {
+                    const totalMinutes = index * 30;
+                    const hours = Math.floor(totalMinutes / 60);
+                    const mins = totalMinutes % 60;
+                    return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+                },
+
+                getActivityIcon(id) {
+                    const all = [...this.activities.mandatory, ...this.activities.optional];
+                    const act = all.find(a => a.id === id);
+                    return act ? act.icon : '';
+                },
+
+                formatTime(blocks) {
+                    const hours = Math.floor(blocks / 2);
+                    const mins = (blocks % 2) * 30;
+                    return `${hours}h ${mins > 0 ? mins + 'm' : ''}`;
+                },
+
+                finishTask2() {
+                    this.step = 'task2-results';
+                },
+
+                getStats() {
+                    const counts = {};
+                    this.timeGrid.forEach(b => {
+                        if(b.activityId) {
+                            counts[b.activityId] = (counts[b.activityId] || 0) + 1;
+                        }
+                    });
+                    
+                    const allActs = [...this.activities.mandatory, ...this.activities.optional];
+                    return Object.entries(counts)
+                        .map(([id, count]) => {
+                            const act = allActs.find(a => a.id === id);
+                            return {
+                                name: act.name,
+                                color: act.color,
+                                darkColor: act.darkColor,
+                                percent: (count / 48) * 100,
+                                time: this.formatTime(count)
+                            };
+                        })
+                        .sort((a, b) => b.percent - a.percent);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
