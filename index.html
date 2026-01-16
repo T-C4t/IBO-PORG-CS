@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300;400;600;700&family=Inter:wght@300;400;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Inter:wght@300;400;600;700&display=swap"
         rel="stylesheet">
 
     <!-- Tailwind CSS -->
@@ -20,7 +20,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        'child': ['Fredoka', 'cursive'],
+                        'child': ['Nunito', 'sans-serif'],
                         'adult': ['Inter', 'sans-serif'],
                     },
                     colors: {
@@ -161,7 +161,8 @@
                     Co chceš dělat?
                 </h2>
 
-                <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl h-full md:h-96">
+                <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl h-full md:h-96"
+                    x-show="!(appStorage.task1Completed && appStorage.task2Completed)">
                     <!-- Task 1 Card -->
                     <button @click="setView('task-1')"
                         class="relative flex-1 rounded-3xl p-8 text-left transition-all transform hover:scale-105 group overflow-hidden"
@@ -199,6 +200,18 @@
                             class="absolute top-4 right-4 bg-white text-green-600 rounded-full p-2 shadow-sm">
                             ✅ Hotovo
                         </div>
+                    </button>
+                </div>
+
+                <!-- Final Results Call to Action (Visible when both done) -->
+                <div x-show="appStorage.task1Completed && appStorage.task2Completed"
+                    class="w-full max-w-3xl bg-white p-8 rounded-3xl shadow-2xl text-center flex flex-col items-center animate-bounce-in">
+                    <h3 class="text-3xl font-bold mb-4 text-slate-800">Oba úkoly jsou hotové! 🎉</h3>
+                    <p class="text-xl text-gray-600 mb-8">Podívej se na své celkové hodnocení.</p>
+                    <button @click="setView('final-results')"
+                        class="px-10 py-5 rounded-full text-2xl font-bold shadow-xl transition transform hover:scale-110"
+                        :class="ageMode === 'child' ? 'bg-child-blue text-white' : 'bg-blue-600 text-white'">
+                        Zobrazit vysvědčení 📜
                     </button>
                 </div>
             </div>
@@ -460,8 +473,9 @@
                                     :class="cell ? 'border-solid border-transparent shadow-sm' : ''">
 
                                     <!-- Time Label (Small) -->
+                                    <!-- Time Label (Small) -->
                                     <span
-                                        class="absolute top-1 left-1 text-[8px] md:text-[10px] text-gray-300 pointer-events-none font-mono"
+                                        class="absolute top-1 left-1 text-[9px] md:text-[11px] text-slate-400 font-bold pointer-events-none font-mono"
                                         x-text="formatTime(index)"></span>
 
                                     <!-- Filled Content -->
@@ -541,6 +555,47 @@
                     </div>
                 </div>
 
+            </div>
+
+            <!-- VIEW: Final Results -->
+            <div x-show="currentView === 'final-results'"
+                class="absolute inset-0 bg-white z-50 flex flex-col items-center justify-center p-8 overflow-hidden"
+                x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-90"
+                x-transition:enter-end="opacity-100 scale-100">
+
+                <!-- Confetti Background (Simulated with simple particles or just gradient) -->
+                <div class="absolute inset-0 opacity-10 pointer-events-none"
+                    :class="ageMode === 'child' ? 'bg-gradient-to-br from-yellow-300 via-pink-300 to-green-300' : 'bg-slate-100'">
+                </div>
+
+                <div class="relative z-10 max-w-2xl w-full text-center bg-white/80 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border-4"
+                    :class="ageMode === 'child' ? 'border-child-yellow' : 'border-slate-200'">
+
+                    <h2 class="text-3xl font-bold uppercase tracking-widest text-gray-400 mb-4">Závěrečné hodnocení</h2>
+
+                    <!-- Grade Circle -->
+                    <div class="w-48 h-48 mx-auto rounded-full flex items-center justify-center mb-8 border-8 shadow-inner"
+                        :class="{
+                             'border-green-500 text-green-500 bg-green-50': ['A', 'B'].includes(grade),
+                             'border-yellow-500 text-yellow-500 bg-yellow-50': grade === 'C',
+                             'border-red-500 text-red-500 bg-red-50': ['D', 'F'].includes(grade)
+                         }">
+                        <span class="text-9xl font-black" x-text="grade"></span>
+                    </div>
+
+                    <!-- Feedback Text -->
+                    <h3 class="text-2xl md:text-3xl font-bold mb-4" x-text="finalFeedback"
+                        :class="ageMode === 'child' ? 'text-child-blue' : 'text-slate-800'"></h3>
+
+                    <p class="text-gray-500 mb-12">Dokončil jsi oba úkoly. Doufáme, že ti workshop pomohl!</p>
+
+                    <!-- Restart -->
+                    <button @click="resetApp()"
+                        class="px-10 py-5 rounded-full text-xl font-bold transition transform hover:scale-105 shadow-xl"
+                        :class="ageMode === 'child' ? 'bg-child-blue text-white hover:bg-purple-800' : 'bg-slate-800 text-white hover:bg-slate-900'">
+                        🔄 Začít úplně znovu
+                    </button>
+                </div>
             </div>
 
         </main>

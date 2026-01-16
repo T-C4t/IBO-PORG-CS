@@ -28,6 +28,11 @@ document.addEventListener('alpine:init', () => {
                 if (this.ageMode) {
                     this.currentView = 'menu';
                 }
+
+                // Recalculate grade if tasks are done
+                if (this.appStorage.task1Completed && this.appStorage.task2Completed) {
+                    this.calculateGrade();
+                }
             }
         },
 
@@ -61,7 +66,58 @@ document.addEventListener('alpine:init', () => {
         completeTask(taskId) {
             if (taskId === 1) this.appStorage.task1Completed = true;
             if (taskId === 2) this.appStorage.task2Completed = true;
+
+            // Calculate grade if both done
+            if (this.appStorage.task1Completed && this.appStorage.task2Completed) {
+                this.calculateGrade();
+            }
+
             this.saveState();
+
+            // Check if both are done
+            if (this.appStorage.task1Completed && this.appStorage.task2Completed) {
+                // Determine if we should show final results immediately or waiting for user
+                // For now, let's just make the view available or show a notification?
+                // PRD/Prompt implies automatic transition or availability. 
+                // Let's auto-transition if they are on a task view, or wait if menu.
+                // Actually prompt says "automatically appear or become available".
+                // Safest UX: Show a "Final Evaluation Ready" button in Menu, or redirect.
+                // Let's add a check in Menu view to show the "Final Result" button.
+            }
+        },
+
+        grade: null,
+
+        calculateGrade() {
+            // Calculate grade (0-5 points)
+            // 1. Quiz Score: Count 'ideal' answers
+            const quizState = JSON.parse(localStorage.getItem('bnn_quiz_state') || '{}');
+            const answers = quizState.answers || [];
+            const quizScore = answers.filter(a => a && a.type === 'ideal').length; // Max 3
+
+            // 2. Planner Score: <= 2h = 2 pts, > 2h = 0 pts
+            const plannerState = JSON.parse(localStorage.getItem('bnn_planner_state') || '{}');
+            const grid = plannerState.grid || [];
+            const screenBlocks = grid.filter(id => id === 'screen').length;
+            const hours = screenBlocks * 0.5;
+            const plannerScore = hours <= 2 ? 2 : 0; // Max 2
+
+            const totalScore = quizScore + plannerScore; // Max 5
+
+            if (totalScore >= 5) this.grade = 'A';
+            else if (totalScore === 4) this.grade = 'B';
+            else if (totalScore === 3) this.grade = 'C';
+            else if (totalScore === 2) this.grade = 'D';
+            else this.grade = 'F';
+        },
+
+        get finalFeedback() {
+            const grade = this.grade;
+            if (grade === 'A') return 'Fantastické! Jsi skutečný digitální mistr. 🏆';
+            if (grade === 'B') return 'Skvělá práce! Rozumíš tomu, jen malý kousek chyběl k dokonalosti.';
+            if (grade === 'C') return 'Dobrá práce, ale je tu prostor pro zlepšení. Zkus se zamyslet nad svým časem nebo reakcemi.';
+            if (grade === 'D') return 'Pozor! V online světě bys měl být opatrnější a hlídat si čas.';
+            return 'Fíha! Tohle se nepovedlo. Zkus si kurz projít znovu a naučit se víc o bezpečí.';
         }
     }));
 
