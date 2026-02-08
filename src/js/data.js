@@ -6,69 +6,42 @@
  */
 const SCENARIOS = [
     {
-        id: 'bullying',
-        title: 'Kyberšikana',
-        description: 'Pod tvou fotkou na Instagramu se objevil ošklivý komentář: "Jsi trapný/á a nikdo tě nemá rád!" Co uděláš?',
+        id: 'humor',
+        title: 'Vtipný příspěvek',
+        description: 'Sdílel/a jsi vtipný příspěvek, ale ostatní se smějí tobě, ne vtipu. Co uděláš?',
         options: [
-            {
-                text: 'Napíšu mu taky něco ošklivého, ať vidí!',
-                type: 'bad',
-                feedback: '⚠️ To není dobrý nápad. Odplácení jen zhorší situaci a můžeš se stát také agresorem. Zlo plodí zlo!'
-            },
-            {
-                text: 'Smažu to a budu dělat, že to nevidím.',
-                type: 'ok',
-                feedback: '🤔 To je v pořádku, ale agresor to může zkusit znovu. Někdy je lepší to nenechat jen tak.'
-            },
-            {
-                text: 'Komentář nahlásím, autora zablokuju a řeknu to rodičům.',
-                type: 'ideal',
-                feedback: '🌟 Skvělá práce! To je nejlepší řešení. Nahlášením pomůžeš i ostatním a blokace tě ochrání. Rodiče ti pomůžou situaci řešit.'
-            }
+            { text: 'Smazat příspěvek', type: 'ideal', feedback: '🌟 Skvělé! Ukončíš nepříjemnou situaci a dáš najevo, že umíš uznat, když něco nevyšlo.' },
+            { text: 'Uznat chybu (např. "Tohle nevyšlo 😅")', type: 'ideal', feedback: '🌟 Výborně! Krátká reakce často napětí rychle rozpustí.' },
+            { text: 'Ignorovat komentáře', type: 'ok', feedback: '🤔 Jde to. Pokud nejde o urážky, pozornost lidí často sama odezní.' },
+            { text: 'Svěřit se někomu blízkému', type: 'ok', feedback: '🤔 Dobrý nápad. Pomůže ti to zpracovat stud a získat odstup.' },
+            { text: 'Dát si na chvíli pauzu od sítí', type: 'ok', feedback: '🤔 Rozumné. Krátké odpojení sníží emoční tlak.' },
+            { text: 'Bránit se v komentářích', type: 'bad', feedback: '⚠️ Pozor! Obrana nebo vysvětlování humoru většinou zesílí posměch.' }
         ]
     },
     {
-        id: 'stranger',
-        title: 'Cizí člověk',
-        description: 'Někdo, koho neznáš, ti poslal žádost o přátelství a zprávu: "Ahoj, máš super profil! Nechceš si pokecat? Bydlím kousek."',
+        id: 'flirting',
+        title: 'Neznámý člověk',
+        description: 'Píše ti neznámý člověk, flirtuje a ptá se na osobní informace. Co vybereš?',
         options: [
-            {
-                text: 'Přijmu ho, chci mít hodně sledujících.',
-                type: 'bad',
-                feedback: '⚠️ Pozor! Nikdy nevíš, kdo se skrývá za profilem. Cizí lidé na internetu mohou být nebezpeční.'
-            },
-            {
-                text: 'Zeptám se, kdo to je a odkud mě zná.',
-                type: 'ok',
-                feedback: '🤔 Opatrnost je na místě, ale odepisováním prozrazuješ, že jsi aktivní. Cizí člověk může lhát.'
-            },
-            {
-                text: 'Žádost odmítnu a profil zablokuju. Cizí lidi nepřidávám.',
-                type: 'ideal',
-                feedback: '🌟 Výborně! Cizí lidi na internetu si do přátel nepřidávej. Bezpečí je přednější než počet sledujících.'
-            }
+            { text: 'Zablokovat dotyčného', type: 'ideal', feedback: '🌟 Skvělá práce! Okamžitě přerušíš kontakt a ochráníš své soukromí.' },
+            { text: 'Nahlásit profil nebo zprávy', type: 'ideal', feedback: '🌟 Super! Pomáháš zastavit obtěžování a chráníš i ostatní.' },
+            { text: 'Svěřit se někomu dospělému', type: 'ok', feedback: '🤔 Dobře děláš. Získáš podporu a radu, jak situaci řešit.' },
+            { text: 'Omezit, kdo ti může psát', type: 'ok', feedback: '🤔 Správně. Snížíš pravděpodobnost, že se to bude opakovat.' },
+            { text: 'Ignorovat, ono to přestane', type: 'bad', feedback: '⚠️ Rizikové. Často to vede k tomu, že dotyčný pokračuje.' },
+            { text: 'Navázat konverzaci a odpovídat', type: 'bad', feedback: '⚠️ Nebezpečné! Zvyšuješ riziko manipulace a zneužití informací.' }
         ]
     },
     {
-        id: 'password',
-        title: 'Heslo',
-        description: 'Nejlepší kamarád/ka po tobě chce heslo k tvému TikToku, aby se mohl/a podívat na videa, co ti chodí "pro tebe".',
+        id: 'comparison',
+        title: 'Srovnávání se',
+        description: 'Často se porovnáváš s ostatními na sítích a máš pocit, že žijí lepší život než ty. Co uděláš?',
         options: [
-            {
-                text: 'Jasně, je to kámoš/ka, věřím mu/jí.',
-                type: 'bad',
-                feedback: '⚠️ Nikdy nikomu nedávej své heslo! Ani nejlepšímu kamarádovi. Můžete se pohádat a on/a toho může zneužít.'
-            },
-            {
-                text: 'Napíšu mu/jí heslo na papírek, ne do chatu.',
-                type: 'bad',
-                feedback: '⚠️ Ani na papírek! Heslo je jen tvoje. Kdo zná heslo, může se vydávat za tebe.'
-            },
-            {
-                text: 'Řeknu ne. Heslo je tajné. Můžeme se kouknout spolu na mém mobilu.',
-                type: 'ideal',
-                feedback: '🌟 Přesně tak! Heslo je jako kartáček na zuby - nikomu se nepůjčuje. Kouknout se spolu je super řešení.'
-            }
+            { text: 'Dát si pauzu od sítí', type: 'ideal', feedback: '🌟 Nejlepší řešení! Přerušíš srovnávání a vrátíš se k vlastnímu prožívání.' },
+            { text: 'Omezit čas na sítích', type: 'ideal', feedback: '🌟 Skvělé! Získáš více podnětů z offline života.' },
+            { text: 'Skrýt účty, co ti vadí', type: 'ok', feedback: '🤔 Pomůže to. Snížíš množství spouštěčů negativního srovnávání.' },
+            { text: 'Připomínat si, že lidé sdílí jen to pěkné', type: 'ok', feedback: '🤔 Pravda. Lidé na sítě dávají jen to nejlepší, ne realitu.' },
+            { text: 'Odinstalovat aplikaci', type: 'ok', feedback: '🤔 Radikální, ale účinné. Změna prostředí zlepší duševní pohodu.' },
+            { text: 'Ignorovat, vždyť ono to přejde', type: 'bad', feedback: '⚠️ Pozor. Neřešené emoce se hromadí a mohou vést k úzkosti.' }
         ]
     }
 ];

@@ -241,7 +241,7 @@
                             :class="ageMode === 'child' ? 'bg-child-yellow' : 'bg-slate-100'">
                             <!-- Dynamic icon based on scenario ID could go here, using generic for now -->
                             <span class="text-9xl filter drop-shadow-lg"
-                                x-text="scenario.id === 'bullying' ? '😢' : (scenario.id === 'stranger' ? '🕵️' : '🔒')"></span>
+                                x-text="scenario.id === 'humor' ? '�' : (scenario.id === 'flirting' ? '🕵️' : '�')"></span>
                         </div>
 
                         <!-- Content Area -->
@@ -253,14 +253,14 @@
                             <p class="text-lg mb-8" x-text="scenario.description"></p>
 
                             <!-- Options -->
-                            <div class="grid gap-4">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <template x-for="option in scenario.options">
                                     <button @click="selectAnswer(option)"
-                                        class="text-left p-4 rounded-xl border-2 transition-all transform hover:scale-[1.02] active:scale-95"
+                                        class="text-left p-3 rounded-xl border-2 transition-all transform hover:scale-[1.01] active:scale-95 flex flex-col justify-center min-h-[80px]"
                                         :class="ageMode === 'child' 
                                                 ? 'border-indigo-100 hover:border-child-pink hover:bg-pink-50' 
                                                 : 'border-slate-200 hover:border-blue-500 hover:bg-slate-50'">
-                                        <span x-text="option.text" class="font-medium text-lg"></span>
+                                        <span x-text="option.text" class="font-bold text-base leading-tight"></span>
                                     </button>
                                 </template>
                             </div>
@@ -587,7 +587,52 @@
                     <h3 class="text-2xl md:text-3xl font-bold mb-4" x-text="finalFeedback"
                         :class="ageMode === 'child' ? 'text-child-blue' : 'text-slate-800'"></h3>
 
-                    <p class="text-gray-500 mb-12">Dokončil jsi oba úkoly. Doufáme, že ti workshop pomohl!</p>
+                    <!-- Detailed Breakdown -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-left">
+                        <!-- Task 1 Breakdown -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
+                                <span>💬</span> Úkol 1: Reakce
+                            </h4>
+                            <div class="space-y-1 text-sm">
+                                <div class="flex justify-between">
+                                    <span>🌟 Ideální řešení:</span>
+                                    <span class="font-bold text-green-600" x-text="quizBreakdown.ideal"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>🤔 Celkem dobré:</span>
+                                    <span class="font-bold text-yellow-600" x-text="quizBreakdown.ok"></span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>⚠️ Nevhodné:</span>
+                                    <span class="font-bold text-red-600" x-text="quizBreakdown.bad"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task 2 Breakdown -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                            <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
+                                <span>📅</span> Úkol 2: Můj Den
+                            </h4>
+                            <div class="space-y-1 text-sm">
+                                <div class="flex justify-between">
+                                    <span>📱 Čas u obrazovek:</span>
+                                    <span class="font-bold"
+                                        :class="plannerBreakdown.isOverLimit ? 'text-red-600' : 'text-green-600'">
+                                        <span x-text="plannerBreakdown.hours"></span>h
+                                    </span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>⚖️ Limit (2h):</span>
+                                    <span class="font-bold"
+                                        x-text="plannerBreakdown.isOverLimit ? 'Překročeno ❌' : 'Dodrženo ✅'"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <p class="text-gray-500 mb-8">Dokončil jsi oba úkoly. Doufáme, že ti workshop pomohl!</p>
 
                     <!-- Restart -->
                     <button @click="resetApp()"

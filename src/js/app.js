@@ -87,22 +87,38 @@ document.addEventListener('alpine:init', () => {
         },
 
         grade: null,
+        quizBreakdown: { ideal: 0, ok: 0, bad: 0 },
+        plannerBreakdown: { hours: 0, isOverLimit: false },
 
         calculateGrade() {
-            // Calculate grade (0-5 points)
-            // 1. Quiz Score: Count 'ideal' answers
+            // 1. Quiz Score Breakdown
             const quizState = JSON.parse(localStorage.getItem('bnn_quiz_state') || '{}');
             const answers = quizState.answers || [];
-            const quizScore = answers.filter(a => a && a.type === 'ideal').length; // Max 3
 
-            // 2. Planner Score: <= 2h = 2 pts, > 2h = 0 pts
+            this.quizBreakdown = {
+                ideal: answers.filter(a => a && a.type === 'ideal').length,
+                ok: answers.filter(a => a && a.type === 'ok').length,
+                bad: answers.filter(a => a && a.type === 'bad').length
+            };
+
+            // 2. Planner Score Breakdown
             const plannerState = JSON.parse(localStorage.getItem('bnn_planner_state') || '{}');
             const grid = plannerState.grid || [];
             const screenBlocks = grid.filter(id => id === 'screen').length;
             const hours = screenBlocks * 0.5;
-            const plannerScore = hours <= 2 ? 2 : 0; // Max 2
 
-            const totalScore = quizScore + plannerScore; // Max 5
+            this.plannerBreakdown = {
+                hours: hours,
+                isOverLimit: hours > 2
+            };
+
+            // Calculate Grade (0-5 points scale)
+            // Quiz: Max 3 points (based on ideal answers, but since we have 3 scenarios, it works)
+            // Planner: Max 2 points if within limit
+            const quizPoints = Math.min(this.quizBreakdown.ideal, 3);
+            const plannerPoints = this.plannerBreakdown.isOverLimit ? 0 : 2;
+
+            const totalScore = quizPoints + plannerPoints;
 
             if (totalScore >= 5) this.grade = 'A';
             else if (totalScore === 4) this.grade = 'B';
@@ -150,6 +166,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         get progressPercentage() {
+            if (!SCENARIOS || SCENARIOS.length === 0) return 0;
             return ((this.currentScenarioIndex) / SCENARIOS.length) * 100;
         },
 
