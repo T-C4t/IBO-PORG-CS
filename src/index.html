@@ -9,7 +9,9 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Inter:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -19,6 +21,7 @@
                 extend: {
                     fontFamily: {
                         'sans': ['Inter', 'sans-serif'],
+                        'caveat': ['Caveat', 'cursive'],
                     }
                 }
             }
@@ -50,34 +53,97 @@
         .custom-scrollbar::-webkit-scrollbar-track {
             background-color: #f1f5f9;
         }
+
+        /* === CHILD THEME: Explorers' Journal === */
+        .paper-bg {
+            background-color: #FFF8F0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+        }
+
+        .striped-bar {
+            background: repeating-linear-gradient(-45deg,
+                    #E8722A,
+                    #E8722A 4px,
+                    #f49d6e 4px,
+                    #f49d6e 8px);
+        }
+
+        .child-card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .child-card-hover:hover {
+            transform: rotate(1deg) translateY(-4px);
+            box-shadow: 6px 6px 0px #264653;
+        }
+
+        /* === TEEN THEME: Terminal Editorial === */
+        .dark-bg {
+            background-color: #0F0F0F;
+        }
+
+        .lime-glow:hover {
+            box-shadow: 0 0 24px rgba(191, 255, 0, 0.08);
+        }
+
+        .dark-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #333;
+        }
+
+        .dark-scrollbar::-webkit-scrollbar-track {
+            background-color: #111;
+        }
+
+        /* Lime fill button transition */
+        .lime-btn {
+            transition: all 0.15s ease;
+        }
+
+        .lime-btn:hover {
+            background-color: #BFFF00;
+            color: #0F0F0F;
+        }
     </style>
 </head>
 
-<body
-    class="antialiased h-screen overflow-hidden bg-slate-50 text-slate-800 selection:bg-indigo-100 selection:text-indigo-900 font-sans">
+<body class="antialiased h-screen overflow-hidden font-sans transition-colors duration-300">
 
     <!-- App Container -->
-    <div x-data="app()" class="h-full w-full relative flex flex-col">
+    <div x-data="app()" class="h-full w-full relative flex flex-col" :class="{
+            'paper-bg text-[#264653] selection:bg-orange-200 selection:text-orange-900': userAgeGroup === 'child',
+            'dark-bg text-[#E5E5E5] selection:bg-[#BFFF00]/20 selection:text-[#BFFF00]': userAgeGroup === 'teen'
+        }">
 
         <!-- Header / Navigation -->
-        <header
-            class="flex-none bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-50 shadow-sm">
+        <header class="flex-none px-6 flex justify-between items-center z-50 transition-all duration-300" :class="{
+                'bg-[#264653] border-b-4 border-[#E8722A] py-5 shadow-lg': userAgeGroup === 'child',
+                'bg-transparent border-b border-[#333] py-4': userAgeGroup === 'teen'
+            }">
             <div class="flex items-center gap-3">
-                <span class="text-2xl text-indigo-600">🛡️</span>
+                <span class="transition-all duration-300" :class="{
+                        'text-3xl': userAgeGroup === 'child',
+                        'text-xl': userAgeGroup === 'teen'
+                    }">🛡️</span>
                 <div>
-                    <h1 class="text-xl font-bold text-slate-800 leading-tight">Bezpečně na Netu</h1>
-                    <!-- <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Educational Project</p> -->
+                    <h1 class="font-bold leading-tight transition-all duration-300" :class="{
+                            'text-2xl text-white font-caveat tracking-wide': userAgeGroup === 'child',
+                            'text-lg text-[#E5E5E5] uppercase tracking-[0.2em] font-normal': userAgeGroup === 'teen'
+                        }">Bezpečně na Netu</h1>
                 </div>
             </div>
 
             <div class="flex gap-3">
                 <button x-show="currentView !== 'menu'" @click="setView('menu')"
-                    class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors border border-transparent hover:border-slate-200">
+                    class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300" :class="{
+                        'bg-[#E8722A]/20 text-white hover:bg-[#E8722A]/40 border-2 border-white/30 rounded-lg': userAgeGroup === 'child',
+                        'text-[#6B7280] hover:text-[#BFFF00] border border-[#333] hover:border-[#BFFF00] rounded-none lime-btn': userAgeGroup === 'teen'
+                    }">
                     ← Zpět
                 </button>
-                <button @click="resetApp()"
-                    class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors"
-                    title="Resetovat celý postup">
+                <button @click="resetApp()" class="px-4 py-2 text-sm font-semibold transition-all duration-300" :class="{
+                        'text-white/70 hover:text-white rounded-lg': userAgeGroup === 'child',
+                        'text-[#6B7280] hover:text-red-400 rounded-none': userAgeGroup === 'teen'
+                    }" title="Resetovat celý postup">
                     Od začátku
                 </button>
             </div>
@@ -89,11 +155,17 @@
             <!-- VIEW: Menu / Dashboard -->
             <div x-show="currentView === 'menu'" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                class="absolute inset-0 p-8 md:p-12 overflow-y-auto bg-slate-50">
+                class="absolute inset-0 p-8 md:p-12 overflow-y-auto">
 
                 <div class="max-w-5xl mx-auto">
-                    <h2 class="text-3xl font-bold text-slate-900 mb-2">Vítej v kurzu</h2>
-                    <p class="text-lg text-slate-600 mb-10 max-w-2xl">
+                    <h2 class="font-bold mb-2 transition-all duration-300" :class="{
+                            'text-4xl text-[#264653] font-caveat': userAgeGroup === 'child',
+                            'text-2xl text-[#E5E5E5] uppercase tracking-[0.15em] font-light': userAgeGroup === 'teen'
+                        }">Vítej v kurzu</h2>
+                    <p class="mb-10 max-w-2xl transition-all duration-300" :class="{
+                            'text-lg text-[#264653]/80 font-medium': userAgeGroup === 'child',
+                            'text-sm text-[#6B7280] tracking-wide': userAgeGroup === 'teen'
+                        }">
                         Tento projekt ti pomůže zanalyzovat tvé digitální návyky a naučit se lépe reagovat na rizikové
                         situace online.
                         Pro získání finálního profilu projdi oba moduly.
@@ -102,24 +174,38 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                         <!-- Module 1 Card -->
                         <button @click="setView('module-1')"
-                            class="group relative bg-white rounded-2xl p-8 text-left border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-300 transition-all duration-300 overflow-hidden">
-                            <div
-                                class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transform group-hover:scale-110 transition-all text-8xl text-indigo-900">
+                            class="group relative p-8 text-left border overflow-hidden transition-all duration-300"
+                            :class="{
+                                'bg-[#FFF8F0] rounded-xl border-[3px] border-[#264653] shadow-[4px_4px_0px_#264653] child-card-hover': userAgeGroup === 'child',
+                                'bg-[#1A1A1A] rounded-none border-[1px] border-[#333] lime-glow': userAgeGroup === 'teen'
+                            }">
+                            <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transform group-hover:scale-110 transition-all text-8xl"
+                                :class="{
+                                    'text-[#264653]': userAgeGroup === 'child',
+                                    'text-[#BFFF00]/20': userAgeGroup === 'teen'
+                                }">
                                 💬
                             </div>
 
                             <div class="relative z-10">
-                                <span
-                                    class="text-xs font-bold uppercase text-indigo-600 tracking-wider mb-2 block">Modul
+                                <span class="text-xs font-bold uppercase tracking-widest mb-2 block" :class="{
+                                        'text-[#E8722A]': userAgeGroup === 'child',
+                                        'text-[#BFFF00]': userAgeGroup === 'teen'
+                                    }">Modul
                                     1</span>
-                                <h3
-                                    class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-indigo-700 transition-colors">
-                                    Situace & Reakce</h3>
-                                <p class="text-slate-500 mb-6">Analyzuj rizikové scénáře (kyberšikana, privacy, doxing)
+                                <h3 class="text-2xl font-bold mb-3 transition-colors" :class="{
+                                        'text-[#264653] font-caveat text-3xl group-hover:text-[#E8722A]': userAgeGroup === 'child',
+                                        'text-[#E5E5E5] group-hover:text-[#BFFF00]': userAgeGroup === 'teen'
+                                    }">
+                                    Situace &amp; Reakce</h3>
+                                <p class="mb-6" :class="{
+                                        'text-[#264653]/70': userAgeGroup === 'child',
+                                        'text-[#6B7280]': userAgeGroup === 'teen'
+                                    }">Analyzuj rizikové scénáře (kyberšikana, privacy, doxing)
                                     a vyber nejvhodnější strategii.</p>
 
                                 <div class="flex items-center gap-2 font-semibold"
-                                    :class="appStorage.module1Completed ? 'text-green-600' : 'text-indigo-600'">
+                                    :class="appStorage.module1Completed ? 'text-green-600' : (userAgeGroup === 'child' ? 'text-[#E8722A]' : 'text-[#BFFF00]')">
                                     <span
                                         x-text="appStorage.module1Completed ? 'Hotovo ✓' : 'Spustit analýzu →'"></span>
                                 </div>
@@ -128,24 +214,38 @@
 
                         <!-- Module 2 Card -->
                         <button @click="setView('module-2')"
-                            class="group relative bg-white rounded-2xl p-8 text-left border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-300 transition-all duration-300 overflow-hidden">
-                            <div
-                                class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transform group-hover:scale-110 transition-all text-8xl text-indigo-900">
+                            class="group relative p-8 text-left border overflow-hidden transition-all duration-300"
+                            :class="{
+                                'bg-[#FFF8F0] rounded-xl border-[3px] border-[#264653] shadow-[4px_4px_0px_#264653] child-card-hover': userAgeGroup === 'child',
+                                'bg-[#1A1A1A] rounded-none border-[1px] border-[#333] lime-glow': userAgeGroup === 'teen'
+                            }">
+                            <div class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transform group-hover:scale-110 transition-all text-8xl"
+                                :class="{
+                                    'text-[#264653]': userAgeGroup === 'child',
+                                    'text-[#BFFF00]/20': userAgeGroup === 'teen'
+                                }">
                                 📅
                             </div>
 
                             <div class="relative z-10">
-                                <span
-                                    class="text-xs font-bold uppercase text-indigo-600 tracking-wider mb-2 block">Modul
+                                <span class="text-xs font-bold uppercase tracking-widest mb-2 block" :class="{
+                                        'text-[#2A9D8F]': userAgeGroup === 'child',
+                                        'text-[#BFFF00]': userAgeGroup === 'teen'
+                                    }">Modul
                                     2</span>
-                                <h3
-                                    class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-indigo-700 transition-colors">
+                                <h3 class="text-2xl font-bold mb-3 transition-colors" :class="{
+                                        'text-[#264653] font-caveat text-3xl group-hover:text-[#2A9D8F]': userAgeGroup === 'child',
+                                        'text-[#E5E5E5] group-hover:text-[#BFFF00]': userAgeGroup === 'teen'
+                                    }">
                                     Digitální Den</h3>
-                                <p class="text-slate-500 mb-6">Audit tvého běžného dne. Zjisti, jak technologie
+                                <p class="mb-6" :class="{
+                                        'text-[#264653]/70': userAgeGroup === 'child',
+                                        'text-[#6B7280]': userAgeGroup === 'teen'
+                                    }">Audit tvého běžného dne. Zjisti, jak technologie
                                     ovlivňují tvůj spánek a regeneraci.</p>
 
                                 <div class="flex items-center gap-2 font-semibold"
-                                    :class="appStorage.module2Completed ? 'text-green-600' : 'text-indigo-600'">
+                                    :class="appStorage.module2Completed ? 'text-green-600' : (userAgeGroup === 'child' ? 'text-[#2A9D8F]' : 'text-[#BFFF00]')">
                                     <span x-text="appStorage.module2Completed ? 'Hotovo ✓' : 'Spustit audit →'"></span>
                                 </div>
                             </div>
@@ -154,59 +254,150 @@
 
                     <!-- Final Results Check -->
                     <div x-show="appStorage.module1Completed && appStorage.module2Completed"
-                        class="bg-indigo-900 rounded-2xl p-8 text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                        class="p-8 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6 transition-all duration-300"
+                        :class="{
+                            'bg-[#264653] text-white rounded-xl border-[3px] border-[#E8722A]': userAgeGroup === 'child',
+                            'bg-[#1A1A1A] text-[#E5E5E5] rounded-none border border-[#BFFF00]': userAgeGroup === 'teen'
+                        }">
                         <div>
-                            <h3 class="text-2xl font-bold mb-2">Kompetenční profil je připraven</h3>
-                            <p class="text-indigo-200">Analýza obou modulů byla dokončena. Podívej se na výsledky.</p>
+                            <h3 class="text-2xl font-bold mb-2" :class="{
+                                'font-caveat text-3xl': userAgeGroup === 'child'
+                            }">Kompetenční profil je připraven</h3>
+                            <p :class="{
+                                'text-white/70': userAgeGroup === 'child',
+                                'text-[#6B7280]': userAgeGroup === 'teen'
+                            }">Analýza obou modulů byla dokončena. Podívej se na výsledky.</p>
                         </div>
                         <button @click="setView('final-results')"
-                            class="px-8 py-4 bg-white text-indigo-900 rounded-lg font-bold hover:bg-indigo-50 transition-colors shadow-lg whitespace-nowrap">
+                            class="px-8 py-4 font-bold shadow-lg whitespace-nowrap transition-all duration-300" :class="{
+                                'bg-[#E8722A] text-white hover:bg-[#d4651f] rounded-lg': userAgeGroup === 'child',
+                                'bg-[#BFFF00] text-[#0F0F0F] hover:bg-[#d4ff4d] rounded-none uppercase tracking-widest text-sm': userAgeGroup === 'teen'
+                            }">
                             Zobrazit profil
                         </button>
                     </div>
 
+                </div>
+
+                <!-- Age Gate Modal -->
+                <div x-show="showAgeGate"
+                    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm"
+                    x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0"
+                    x-transition:enter-end="opacity-100" x-cloak>
+                    <div class="bg-white rounded-2xl p-8 max-w-2xl w-full shadow-2xl" @click.away="/* block closing */">
+                        <h2 class="text-3xl font-bold text-slate-900 mb-2 text-center">Vítej v projektu</h2>
+                        <p class="text-slate-600 mb-10 text-center text-lg">
+                            Než začneme, vyber si verzi, která ti nejvíce vyhovuje.
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <!-- Option 1: Child (11-14) -->
+                            <button @click="acceptAgeGate('child')"
+                                class="flex flex-col items-center p-6 rounded-2xl border-2 border-slate-100 hover:border-indigo-500 hover:bg-indigo-50 transition-all text-center group">
+                                <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">🎮</div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-2">Pro děti</h3>
+                                <p class="text-sm text-slate-500">11 – 14 let</p>
+                                <p class="text-xs text-slate-400 mt-4">Hravější grafika a jednodušší vysvětlení.</p>
+                            </button>
+
+                            <!-- Option 2: Teen (15+) -->
+                            <button @click="acceptAgeGate('teen')"
+                                class="flex flex-col items-center p-6 rounded-2xl border-2 border-slate-100 hover:border-teal-500 hover:bg-teal-50 transition-all text-center group">
+                                <div class="text-5xl mb-4 group-hover:scale-110 transition-transform">📱</div>
+                                <h3 class="text-xl font-bold text-slate-900 mb-2">Pro dospívající</h3>
+                                <p class="text-sm text-slate-500">15+ let</p>
+                                <p class="text-xs text-slate-400 mt-4">Serióznější design a detailnější analýza.</p>
+                            </button>
+                        </div>
+
+                        <div class="text-center">
+                            <button @click="window.location.href = 'https://google.com'"
+                                class="text-slate-400 hover:text-slate-600 font-medium text-sm underline decoration-slate-200 underline-offset-4 transition-colors">
+                                Nechci se účastnit a opustit stránku
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- VIEW: Module 1 (Situational Analysis) -->
             <div x-show="currentView === 'module-1'" x-data="quizStore()"
                 @module-complete.window="completeModule($event.detail.moduleId)" x-cloak
-                class="absolute inset-0 bg-slate-50 overflow-y-auto p-4 md:p-8">
+                class="absolute inset-0 overflow-y-auto p-4 md:p-8">
 
                 <div class="max-w-4xl mx-auto h-full flex flex-col">
                     <!-- Progress Header -->
                     <div class="flex justify-between items-center mb-4 flex-none" x-show="!showResults">
-                        <span class="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                        <span class="font-bold uppercase tracking-widest transition-all duration-300" :class="{
+                                'text-base text-[#E8722A]': userAgeGroup === 'child',
+                                'text-xs text-[#6B7280] tracking-[0.2em]': userAgeGroup === 'teen'
+                            }">
                             Případová studie <span x-text="currentScenarioIndex + 1"></span> / <span
                                 x-text="activeScenarios.length"></span>
                         </span>
-                        <div class="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
-                            <div class="h-full bg-indigo-600 transition-all duration-300"
-                                :style="`width: ${progressPercentage}%`"></div>
+                        <div class="overflow-hidden transition-all duration-300" :class="{
+                                'w-40 h-3 bg-[#264653]/20 rounded-full': userAgeGroup === 'child',
+                                'w-32 h-[2px] bg-[#333] rounded-none': userAgeGroup === 'teen'
+                            }">
+                            <div class="h-full transition-all duration-300" :class="{
+                                    'striped-bar rounded-full': userAgeGroup === 'child',
+                                    'bg-[#BFFF00]': userAgeGroup === 'teen'
+                                }" :style="`width: ${progressPercentage}%`"></div>
                         </div>
                     </div>
 
                     <!-- Scenario Card -->
                     <div x-show="!showResults && scenario" x-transition
-                        class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex-grow md:flex-none">
+                        class="shadow-sm border overflow-hidden flex-grow md:flex-none transition-all duration-300"
+                        :class="{
+                            'bg-[#FFF8F0] rounded-xl border-[3px] border-[#264653]': userAgeGroup === 'child',
+                            'bg-[#1A1A1A] rounded-none border border-[#333]': userAgeGroup === 'teen'
+                        }">
 
-                        <div class="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
-                            <div class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 mb-4 uppercase tracking-wide"
-                                x-text="scenario.category"></div>
-                            <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4" x-text="scenario.title"></h2>
-                            <p class="text-lg text-slate-600 leading-relaxed" x-text="scenario.description"></p>
+                        <div class="p-6 md:p-8 border-b transition-all duration-300" :class="{
+                                'border-[#264653]/20 bg-[#264653]/5': userAgeGroup === 'child',
+                                'border-[#333] bg-[#111]': userAgeGroup === 'teen'
+                            }">
+                            <div class="inline-block px-3 py-1 text-xs font-bold mb-4 uppercase tracking-widest transition-all duration-300"
+                                :class="{
+                                    'bg-[#E8722A] text-white rounded-md': userAgeGroup === 'child',
+                                    'bg-[#BFFF00]/10 text-[#BFFF00] rounded-none border border-[#BFFF00]/30': userAgeGroup === 'teen'
+                                }" x-text="scenario.category"></div>
+                            <h2 class="font-bold mb-4 transition-all duration-300" :class="{
+                                    'text-3xl md:text-4xl text-[#264653] font-caveat': userAgeGroup === 'child',
+                                    'text-xl md:text-2xl text-[#E5E5E5]': userAgeGroup === 'teen'
+                                }" x-text="scenario.title"></h2>
+                            <p class="leading-relaxed transition-all duration-300" :class="{
+                                    'text-lg text-[#264653]/80': userAgeGroup === 'child',
+                                    'text-sm text-[#6B7280]': userAgeGroup === 'teen'
+                                }" x-text="scenario.description"></p>
                         </div>
 
-                        <div class="p-6 md:p-8 bg-white">
-                            <h3 class="text-sm font-bold text-slate-400 uppercase mb-4">Vyber jedno řešení:</h3>
+                        <div class="p-6 md:p-8" :class="{
+                                'bg-[#FFF8F0]': userAgeGroup === 'child',
+                                'bg-[#1A1A1A]': userAgeGroup === 'teen'
+                            }">
+                            <h3 class="font-bold uppercase mb-4 transition-all duration-300" :class="{
+                                    'text-base text-[#E8722A]': userAgeGroup === 'child',
+                                    'text-xs text-[#6B7280] tracking-[0.2em]': userAgeGroup === 'teen'
+                                }">Vyber jedno řešení:</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <template x-for="option in scenario.options">
                                     <button @click="selectAnswer(option)"
-                                        class="text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all flex items-center justify-between group h-full">
-                                        <span x-text="option.text"
-                                            class="font-medium text-slate-700 group-hover:text-indigo-900"></span>
-                                        <span
-                                            class="opacity-0 group-hover:opacity-100 text-indigo-500 font-bold ml-2">→</span>
+                                        class="text-left p-4 border transition-all flex items-center justify-between group h-full"
+                                        :class="{
+                                            'border-2 border-[#264653]/30 hover:border-[#E8722A] hover:bg-[#E8722A]/10 rounded-lg': userAgeGroup === 'child',
+                                            'border border-[#333] hover:border-[#BFFF00] hover:bg-[#BFFF00]/5 rounded-none': userAgeGroup === 'teen'
+                                        }">
+                                        <span x-text="option.text" class="font-medium transition-colors" :class="{
+                                                'text-[#264653] group-hover:text-[#E8722A]': userAgeGroup === 'child',
+                                                'text-[#E5E5E5] group-hover:text-[#BFFF00]': userAgeGroup === 'teen'
+                                            }"></span>
+                                        <span class="opacity-0 group-hover:opacity-100 font-bold ml-2 transition-all"
+                                            :class="{
+                                                'text-[#E8722A]': userAgeGroup === 'child',
+                                                'text-[#BFFF00]': userAgeGroup === 'teen'
+                                            }">→</span>
                                     </button>
                                 </template>
                             </div>
@@ -214,32 +405,46 @@
                     </div>
 
                     <!-- Immediate Feedback Overlay -->
-                    <div x-show="showFeedback"
-                        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
-                        x-transition.opacity>
+                    <div x-show="showFeedback" class="fixed inset-0 z-50 flex items-center justify-center p-4"
+                        x-transition.opacity :class="{
+                            'bg-[#264653]/60 backdrop-blur-sm': userAgeGroup === 'child',
+                            'bg-black/70': userAgeGroup === 'teen'
+                        }">
 
-                        <div class="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl transform transition-all"
-                            @click.outside="nextScenario()">
+                        <div class="max-w-lg w-full p-8 shadow-2xl transform transition-all" :class="{
+                                'bg-[#FFF8F0] border-[3px] border-[#264653] rounded-xl': userAgeGroup === 'child',
+                                'bg-[#1A1A1A] border border-[#333] rounded-none': userAgeGroup === 'teen'
+                            }" @click.outside="nextScenario()">
 
                             <div class="flex items-center gap-4 mb-6">
-                                <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0"
+                                <div class="rounded-full flex items-center justify-center shrink-0 transition-all"
                                     :class="{
-                                        'bg-green-100 text-green-600': currentFeedbackBlock?.type === 'ideal',
-                                        'bg-yellow-100 text-yellow-600': currentFeedbackBlock?.type === 'ok',
-                                        'bg-red-100 text-red-600': currentFeedbackBlock?.type === 'bad'
+                                        'w-14 h-14 text-xl': userAgeGroup === 'child',
+                                        'w-10 h-10 text-sm': userAgeGroup === 'teen',
+                                        'bg-green-100 text-green-700': currentFeedbackBlock?.type === 'ideal',
+                                        'bg-yellow-100 text-yellow-700': currentFeedbackBlock?.type === 'ok',
+                                        'bg-red-100 text-red-700': currentFeedbackBlock?.type === 'bad'
                                     }">
                                     <span
                                         x-text="currentFeedbackBlock?.type === 'ideal' ? '✓' : (currentFeedbackBlock?.type === 'bad' ? '!' : 'i')"></span>
                                 </div>
-                                <h3 class="text-xl font-bold text-slate-900"
+                                <h3 class="font-bold transition-all" :class="{
+                                        'text-2xl text-[#264653] font-caveat': userAgeGroup === 'child',
+                                        'text-base text-[#E5E5E5] uppercase tracking-widest font-normal': userAgeGroup === 'teen'
+                                    }"
                                     x-text="currentFeedbackBlock?.type === 'ideal' ? 'Doporučený postup' : (currentFeedbackBlock?.type === 'bad' ? 'Rizikové chování' : 'Akceptovatelné')">
                                 </h3>
                             </div>
 
-                            <p class="text-slate-600 mb-8 leading-relaxed" x-text="currentFeedbackBlock?.feedback"></p>
+                            <p class="mb-8 leading-relaxed transition-all" :class="{
+                                    'text-lg text-[#264653]/80': userAgeGroup === 'child',
+                                    'text-sm text-[#6B7280]': userAgeGroup === 'teen'
+                                }" x-text="currentFeedbackBlock?.feedback"></p>
 
-                            <button @click="nextScenario()"
-                                class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors">
+                            <button @click="nextScenario()" class="w-full py-3 font-bold transition-all" :class="{
+                                    'bg-[#E8722A] hover:bg-[#d4651f] text-white text-lg rounded-lg': userAgeGroup === 'child',
+                                    'bg-[#BFFF00] hover:bg-[#d4ff4d] text-[#0F0F0F] rounded-none uppercase tracking-widest text-sm': userAgeGroup === 'teen'
+                                }">
                                 Pokračovat
                             </button>
                         </div>
@@ -247,13 +452,23 @@
 
                     <!-- Module 1 Completion -->
                     <div x-show="showResults" class="text-center py-12 max-w-2xl mx-auto">
-                        <div
-                            class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
+                        <div class="flex items-center justify-center mx-auto mb-6 transition-all duration-300" :class="{
+                                'w-20 h-20 rounded-full bg-[#2A9D8F] text-white text-4xl': userAgeGroup === 'child',
+                                'w-16 h-16 rounded-none bg-[#BFFF00]/10 text-[#BFFF00] text-3xl border border-[#BFFF00]': userAgeGroup === 'teen'
+                            }">
                             ✓</div>
-                        <h2 class="text-3xl font-bold text-slate-900 mb-4">Analýza dokončena</h2>
-                        <p class="text-slate-600 mb-8">Tvé odpovědi byly zaznamenány do kompetenčního profilu.</p>
-                        <button @click="setView('menu')"
-                            class="px-8 py-3 bg-slate-900 text-white rounded-lg font-bold hover:bg-slate-800 transition-colors">
+                        <h2 class="font-bold mb-4 transition-all duration-300" :class="{
+                                'text-4xl text-[#264653] font-caveat': userAgeGroup === 'child',
+                                'text-2xl text-[#E5E5E5] uppercase tracking-[0.15em] font-light': userAgeGroup === 'teen'
+                            }">Analýza dokončena</h2>
+                        <p class="mb-8 transition-all duration-300" :class="{
+                                'text-lg text-[#264653]/80': userAgeGroup === 'child',
+                                'text-sm text-[#6B7280]': userAgeGroup === 'teen'
+                            }">Tvé odpovědi byly zaznamenány do kompetenčního profilu.</p>
+                        <button @click="setView('menu')" class="px-8 py-3 font-bold transition-all duration-300" :class="{
+                                'bg-[#E8722A] hover:bg-[#d4651f] text-white text-lg rounded-lg': userAgeGroup === 'child',
+                                'bg-[#BFFF00] hover:bg-[#d4ff4d] text-[#0F0F0F] rounded-none uppercase tracking-widest text-sm': userAgeGroup === 'teen'
+                            }">
                             Zpět na přehled
                         </button>
                     </div>
@@ -263,30 +478,50 @@
             <!-- VIEW: Module 2 (Day Audit) -->
             <div x-show="currentView === 'module-2'" x-data="plannerStore()"
                 @module-complete.window="completeModule($event.detail.moduleId)" @mouseup.window="stopDrag()" x-cloak
-                class="absolute inset-0 flex flex-col h-full bg-slate-50 overflow-hidden">
+                class="absolute inset-0 flex flex-col h-full overflow-hidden">
 
                 <!-- Audit Header -->
-                <div
-                    class="bg-white border-b border-slate-200 p-3 flex justify-between items-center shadow-sm z-10 flex-none">
+                <div class="border-b p-3 flex justify-between items-center shadow-sm z-10 flex-none transition-all duration-300"
+                    :class="{
+                        'bg-[#264653] border-[#E8722A]': userAgeGroup === 'child',
+                        'bg-[#111] border-[#333]': userAgeGroup === 'teen'
+                    }">
                     <div class="flex items-center gap-4">
-                        <h2 class="font-bold text-slate-800 hidden md:block">Digitální Den</h2>
-                        <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
-                        <div class="text-xs text-slate-500">
+                        <h2 class="font-bold hidden md:block transition-colors duration-300" :class="{
+                                'text-white font-caveat text-xl': userAgeGroup === 'child',
+                                'text-[#E5E5E5] uppercase tracking-[0.15em] text-sm font-normal': userAgeGroup === 'teen'
+                            }">Digitální Den</h2>
+                        <div class="h-6 w-px hidden md:block transition-colors duration-300" :class="{
+                                'bg-white/20': userAgeGroup === 'child',
+                                'bg-[#333]': userAgeGroup === 'teen'
+                            }"></div>
+                        <div class="text-xs transition-colors duration-300" :class="{
+                                'text-white/70': userAgeGroup === 'child',
+                                'text-[#6B7280]': userAgeGroup === 'teen'
+                            }">
                             Vyplň svůj běžný den. <br class="md:hidden"> Nezapomeň na spánek!
                         </div>
                     </div>
 
                     <div class="flex items-center gap-4">
                         <div class="text-right hidden sm:block">
-                            <div class="text-xs uppercase font-bold text-slate-400">Pasivní Screen Time</div>
+                            <div class="text-xs uppercase font-bold tracking-widest transition-colors duration-300"
+                                :class="{
+                                    'text-white/60': userAgeGroup === 'child',
+                                    'text-[#6B7280]': userAgeGroup === 'teen'
+                                }">Pasivní Screen Time</div>
                             <div class="font-mono font-bold"
-                                :class="totalPassiveScreenTime > 2 ? 'text-orange-500' : 'text-green-600'">
+                                :class="totalPassiveScreenTime > 2 ? 'text-orange-500' : 'text-green-500'">
                                 <span x-text="totalPassiveScreenTime"></span>h
                             </div>
                         </div>
                         <button @click="evaluateDay()" :disabled="!isGridFull"
-                            class="px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-sm border border-transparent"
-                            :class="isGridFull ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md' : 'bg-slate-100 text-slate-400 cursor-not-allowed'">
+                            class="px-6 py-2 font-bold text-sm transition-all shadow-sm border"
+                            :class="isGridFull ? (
+                                userAgeGroup === 'child' ? 
+                                    'bg-[#E8722A] hover:bg-[#d4651f] text-white border-transparent shadow-md rounded-lg' : 
+                                    'bg-[#BFFF00] text-[#0F0F0F] hover:bg-[#d4ff4d] border-transparent shadow-md rounded-none uppercase tracking-widest'
+                            ) : (userAgeGroup === 'teen' ? 'bg-[#1A1A1A] text-[#333] cursor-not-allowed border-[#333] rounded-none' : 'bg-slate-100 text-slate-400 cursor-not-allowed border-transparent rounded-lg')">
                             Dokončit audit
                         </button>
                     </div>
@@ -294,14 +529,23 @@
 
                 <div class="flex-grow flex overflow-hidden">
                     <!-- Sidebar Palette (Desktop) -->
-                    <div
-                        class="w-64 bg-white border-r border-slate-200 overflow-y-auto p-4 custom-scrollbar hidden md:block flex-none">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Aktivity</h3>
+                    <div class="w-64 border-r overflow-y-auto p-4 custom-scrollbar hidden md:block flex-none transition-colors duration-300"
+                        :class="{
+                            'bg-[#FFF8F0] border-[#264653]/20': userAgeGroup === 'child',
+                            'bg-[#111] border-[#333] dark-scrollbar': userAgeGroup === 'teen'
+                        }">
+                        <h3 class="text-xs font-bold uppercase tracking-widest mb-4 transition-colors" :class="{
+                            'text-[#E8722A]': userAgeGroup === 'child',
+                            'text-[#6B7280]': userAgeGroup === 'teen'
+                        }">Aktivity</h3>
 
                         <div class="space-y-6">
                             <!-- Mandatory -->
                             <div>
-                                <h4 class="text-xs font-semibold text-slate-900 mb-2 flex justify-between">
+                                <h4 class="text-xs font-semibold mb-2 flex justify-between transition-colors" :class="{
+                                    'text-[#264653]': userAgeGroup === 'child',
+                                    'text-[#E5E5E5]': userAgeGroup === 'teen'
+                                }">
                                     Základní potřeby
                                     <span x-show="mandatoryComplete" class="text-green-500">✓</span>
                                 </h4>
@@ -322,7 +566,10 @@
 
                             <!-- Optional -->
                             <div :class="mandatoryComplete ? '' : 'opacity-40 pointer-events-none'">
-                                <h4 class="text-xs font-semibold text-slate-900 mb-2">Volný čas</h4>
+                                <h4 class="text-xs font-semibold mb-2 transition-colors" :class="{
+                                    'text-[#264653]': userAgeGroup === 'child',
+                                    'text-[#E5E5E5]': userAgeGroup === 'teen'
+                                }">Volný čas</h4>
                                 <div class="space-y-1">
                                     <template x-for="act in optionalActivities">
                                         <button @click="selectActivity(act.id)"
@@ -341,7 +588,11 @@
                     </div>
 
                     <!-- Main Grid Container -->
-                    <div class="flex-grow bg-slate-100 p-2 md:p-4 overflow-y-auto relative flex flex-col">
+                    <div class="flex-grow p-2 md:p-4 overflow-y-auto relative flex flex-col transition-colors duration-300"
+                        :class="{
+                            'bg-[#FFF8F0]/50': userAgeGroup === 'child',
+                            'bg-[#0F0F0F]': userAgeGroup === 'teen'
+                        }">
 
                         <!-- Mobile Palette (Visible < MD) -->
                         <div
@@ -360,16 +611,26 @@
                         <!-- FIX: Reduced padding and ensured container fits. Using flex-grow on container is good, but 
                              if grid items are too tall, they will scroll. That's expected, but we want to minimize it.
                              Reducing grid gap and container max-width. -->
-                        <div
-                            class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1 w-full max-w-6xl mx-auto bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+                        <div class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1 w-full max-w-6xl mx-auto p-3 shadow-sm border transition-colors duration-300"
+                            :class="{
+                                'bg-white rounded-xl border-[#264653]/20': userAgeGroup === 'child',
+                                'bg-[#1A1A1A] rounded-none border-[#333]': userAgeGroup === 'teen'
+                            }">
                             <template x-for="(cell, index) in grid">
                                 <div @mousedown="startDrag(index)" @mouseenter="onDragOver(index)"
-                                    class="aspect-square relative border border-slate-100 hover:border-indigo-300 transition-colors cursor-pointer"
-                                    :class="cell ? '' : 'bg-slate-50'">
+                                    class="aspect-square relative border transition-colors cursor-pointer" :class="{
+                                        'border-slate-100 hover:border-[#E8722A]': userAgeGroup === 'child',
+                                        'border-[#333] hover:border-[#BFFF00]': userAgeGroup === 'teen',
+                                        'bg-white': !cell && userAgeGroup === 'child',
+                                        'bg-[#111]': !cell && userAgeGroup === 'teen'
+                                    }">
 
                                     <span
-                                        class="absolute top-0 left-1 text-[9px] text-slate-300 font-mono pointer-events-none"
-                                        x-text="formatTime(index)" x-show="!cell"></span>
+                                        class="absolute top-0 left-1 text-[9px] font-mono pointer-events-none transition-colors"
+                                        :class="{
+                                            'text-[#264653]/30': userAgeGroup === 'child',
+                                            'text-[#6B7280]/50': userAgeGroup === 'teen'
+                                        }" x-text="formatTime(index)" x-show="!cell"></span>
 
                                     <div x-show="cell"
                                         class="w-full h-full flex items-center justify-center text-sm font-bold border opacity-90"
@@ -384,11 +645,23 @@
 
                 <!-- Module 2 Completion Overlay -->
                 <div x-show="showResults"
-                    class="absolute inset-0 bg-white z-50 flex flex-col items-center justify-center p-8">
-                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Denní audit uložen</h2>
-                    <p class="text-slate-600 mb-8">Data o tvém spánku a času u obrazovky byla zpracována.</p>
-                    <button @click="setView('menu')"
-                        class="px-8 py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors">
+                    class="absolute inset-0 z-50 flex flex-col items-center justify-center p-8 transition-all duration-300"
+                    :class="{
+                        'paper-bg': userAgeGroup === 'child',
+                        'dark-bg': userAgeGroup === 'teen'
+                    }">
+                    <h2 class="font-bold mb-4 transition-all duration-300" :class="{
+                            'text-4xl text-[#264653] font-caveat': userAgeGroup === 'child',
+                            'text-2xl text-[#E5E5E5] uppercase tracking-[0.15em] font-light': userAgeGroup === 'teen'
+                        }">Denní audit uložen</h2>
+                    <p class="mb-8 transition-all duration-300" :class="{
+                            'text-lg text-[#264653]/80': userAgeGroup === 'child',
+                            'text-sm text-[#6B7280]': userAgeGroup === 'teen'
+                        }">Data o tvém spánku a času u obrazovky byla zpracována.</p>
+                    <button @click="setView('menu')" class="px-8 py-3 font-bold transition-all duration-300" :class="{
+                            'bg-[#2A9D8F] hover:bg-[#248f82] text-white text-lg rounded-lg': userAgeGroup === 'child',
+                            'bg-[#BFFF00] hover:bg-[#d4ff4d] text-[#0F0F0F] rounded-none uppercase tracking-widest text-sm': userAgeGroup === 'teen'
+                        }">
                         Pokračovat
                     </button>
                 </div>
@@ -397,96 +670,173 @@
 
             <!-- VIEW: Final Results (Competency Profile) -->
             <div x-show="currentView === 'final-results'"
-                class="absolute inset-0 bg-slate-50 z-50 overflow-y-auto p-4 md:p-12">
+                class="absolute inset-0 z-50 overflow-y-auto p-4 md:p-12 transition-colors duration-300" :class="{
+                    'paper-bg': userAgeGroup === 'child',
+                    'dark-bg': userAgeGroup === 'teen'
+                }">
 
-                <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
-                    <div class="bg-indigo-900 p-8 text-white text-center">
-                        <h2 class="text-3xl font-bold mb-2">Kompetenční Profil</h2>
-                        <p class="text-indigo-200">Souhrn tvých digitálních návyků a postojů</p>
+                <div class="max-w-4xl mx-auto shadow-2xl overflow-hidden shadow-black/20" :class="{
+                        'bg-[#FFF8F0] rounded-xl border-[3px] border-[#264653]': userAgeGroup === 'child',
+                        'bg-[#1A1A1A] rounded-none border border-[#333]': userAgeGroup === 'teen'
+                    }">
+                    <div class="p-8 text-center border-b" :class="{
+                            'bg-[#264653] text-white border-[#E8722A]': userAgeGroup === 'child',
+                            'bg-[#111] text-[#E5E5E5] border-[#333]': userAgeGroup === 'teen'
+                        }">
+                        <h2 class="text-3xl font-bold mb-2 transition-all" :class="{
+                                'font-caveat text-4xl': userAgeGroup === 'child',
+                                'uppercase tracking-[0.2em] font-light': userAgeGroup === 'teen'
+                            }">Kompetenční Profil</h2>
+                        <p class="transition-colors" :class="{
+                                'text-white/70': userAgeGroup === 'child',
+                                'text-[#6B7280] text-sm': userAgeGroup === 'teen'
+                            }">Souhrn tvých digitálních návyků a postojů</p>
                     </div>
 
-                    <div class="p-8 md:p-12 space-y-12">
+                    <div class="p-8 md:p-12 space-y-12 transition-colors" :class="{
+                            'bg-[#FFF8F0]': userAgeGroup === 'child',
+                            'bg-[#1A1A1A]': userAgeGroup === 'teen'
+                        }">
 
                         <!-- Skill Bars -->
                         <div class="space-y-8">
                             <!-- Safety -->
                             <div>
                                 <div class="flex justify-between mb-2">
-                                    <h3 class="font-bold text-slate-800">Digitální Bezpečnost a Ochrana Dat</h3>
-                                    <span class="font-mono font-bold text-indigo-600"
-                                        x-text="Math.round(profile.safety || 0) + '%'"></span>
+                                    <h3 class="font-bold transition-colors" :class="{
+                                            'text-[#264653] font-caveat text-xl': userAgeGroup === 'child',
+                                            'text-[#BFFF00] uppercase tracking-widest text-xs': userAgeGroup === 'teen'
+                                        }">Digitální Bezpečnost a Ochrana Dat</h3>
+                                    <span class="font-mono font-bold transition-colors" :class="{
+                                            'text-[#E8722A]': userAgeGroup === 'child',
+                                            'text-[#BFFF00]': userAgeGroup === 'teen'
+                                        }" x-text="Math.round(profile.safety || 0) + '%'"></span>
                                 </div>
-                                <div class="h-4 bg-slate-100 rounded-full overflow-hidden">
-                                    <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000"
-                                        :style="`width: ${profile.safety || 0}%`"></div>
+                                <div class="h-4 overflow-hidden transition-all" :class="{
+                                        'bg-[#264653]/10 rounded-full border border-[#264653]/10': userAgeGroup === 'child',
+                                        'bg-[#333] rounded-none h-[2px]': userAgeGroup === 'teen'
+                                    }">
+                                    <div class="h-full transition-all duration-1000" :class="{
+                                            'bg-[#E8722A] rounded-full': userAgeGroup === 'child',
+                                            'bg-[#BFFF00]': userAgeGroup === 'teen'
+                                        }" :style="`width: ${profile.safety || 0}%`"></div>
                                 </div>
-                                <p class="text-sm text-slate-600 mt-2 bg-slate-50 p-4 rounded-lg border-l-4 border-indigo-500"
-                                    x-text="feedback.safety"></p>
+                                <p class="text-sm mt-3 p-4 border-l-4 transition-colors shadow-sm" :class="{
+                                        'bg-white text-[#264653] border-[#E8722A] rounded-r-lg': userAgeGroup === 'child',
+                                        'bg-[#111] text-[#6B7280] border-[#BFFF00]': userAgeGroup === 'teen'
+                                    }" x-text="feedback.safety"></p>
                             </div>
 
                             <!-- Empathy -->
                             <div>
                                 <div class="flex justify-between mb-2">
-                                    <h3 class="font-bold text-slate-800">Sociální Interakce a Emoční Inteligence</h3>
-                                    <span class="font-mono font-bold text-indigo-600"
-                                        x-text="Math.round(profile.empathy || 0) + '%'"></span>
+                                    <h3 class="font-bold transition-colors" :class="{
+                                            'text-[#264653] font-caveat text-xl': userAgeGroup === 'child',
+                                            'text-[#BFFF00] uppercase tracking-widest text-xs': userAgeGroup === 'teen'
+                                        }">Sociální Interakce a Emoční Inteligence</h3>
+                                    <span class="font-mono font-bold transition-colors" :class="{
+                                            'text-[#2A9D8F]': userAgeGroup === 'child',
+                                            'text-[#BFFF00]': userAgeGroup === 'teen'
+                                        }" x-text="Math.round(profile.empathy || 0) + '%'"></span>
                                 </div>
-                                <div class="h-4 bg-slate-100 rounded-full overflow-hidden">
-                                    <div class="h-full bg-teal-500 rounded-full transition-all duration-1000"
-                                        :style="`width: ${profile.empathy || 0}%`"></div>
+                                <div class="h-4 overflow-hidden transition-all" :class="{
+                                        'bg-[#264653]/10 rounded-full border border-[#264653]/10': userAgeGroup === 'child',
+                                        'bg-[#333] rounded-none h-[2px]': userAgeGroup === 'teen'
+                                    }">
+                                    <div class="h-full transition-all duration-1000" :class="{
+                                            'bg-[#2A9D8F] rounded-full': userAgeGroup === 'child',
+                                            'bg-[#BFFF00]': userAgeGroup === 'teen'
+                                        }" :style="`width: ${profile.empathy || 0}%`"></div>
                                 </div>
-                                <p class="text-sm text-slate-600 mt-2 bg-slate-50 p-4 rounded-lg border-l-4 border-teal-500"
-                                    x-text="feedback.empathy"></p>
+                                <p class="text-sm mt-3 p-4 border-l-4 transition-colors shadow-sm" :class="{
+                                        'bg-white text-[#264653] border-[#2A9D8F] rounded-r-lg': userAgeGroup === 'child',
+                                        'bg-[#111] text-[#6B7280] border-[#BFFF00]': userAgeGroup === 'teen'
+                                    }" x-text="feedback.empathy"></p>
                             </div>
 
                             <!-- Wellbeing -->
                             <div>
                                 <div class="flex justify-between mb-2">
-                                    <h3 class="font-bold text-slate-800">Digitální Wellbeing a Psychohygiena</h3>
-                                    <span class="font-mono font-bold text-indigo-600"
-                                        x-text="Math.round(profile.wellbeing || 0) + '%'"></span>
+                                    <h3 class="font-bold transition-colors" :class="{
+                                            'text-[#264653] font-caveat text-xl': userAgeGroup === 'child',
+                                            'text-[#BFFF00] uppercase tracking-widest text-xs': userAgeGroup === 'teen'
+                                        }">Digitální Wellbeing a Psychohygiena</h3>
+                                    <span class="font-mono font-bold transition-colors" :class="{
+                                            'text-[#264653]': userAgeGroup === 'child',
+                                            'text-[#BFFF00]': userAgeGroup === 'teen'
+                                        }" x-text="Math.round(profile.wellbeing || 0) + '%'"></span>
                                 </div>
-                                <div class="h-4 bg-slate-100 rounded-full overflow-hidden">
-                                    <div class="h-full bg-rose-500 rounded-full transition-all duration-1000"
-                                        :style="`width: ${profile.wellbeing || 0}%`"></div>
+                                <div class="h-4 overflow-hidden transition-all" :class="{
+                                        'bg-[#264653]/10 rounded-full border border-[#264653]/10': userAgeGroup === 'child',
+                                        'bg-[#333] rounded-none h-[2px]': userAgeGroup === 'teen'
+                                    }">
+                                    <div class="h-full transition-all duration-1000" :class="{
+                                            'bg-[#264653] rounded-full': userAgeGroup === 'child',
+                                            'bg-[#BFFF00]': userAgeGroup === 'teen'
+                                        }" :style="`width: ${profile.wellbeing || 0}%`"></div>
                                 </div>
-                                <p class="text-sm text-slate-600 mt-2 bg-slate-50 p-4 rounded-lg border-l-4 border-rose-500"
-                                    x-text="feedback.wellbeing"></p>
+                                <p class="text-sm mt-3 p-4 border-l-4 transition-colors shadow-sm" :class="{
+                                        'bg-white text-[#264653] border-[#264653] rounded-r-lg': userAgeGroup === 'child',
+                                        'bg-[#111] text-[#6B7280] border-[#BFFF00]': userAgeGroup === 'teen'
+                                    }" x-text="feedback.wellbeing"></p>
                             </div>
                         </div>
 
 
 
                         <!-- Combined Analysis & Feedback -->
-                        <div class="bg-indigo-50/50 p-6 md:p-8 rounded-2xl border border-indigo-100 shadow-sm"
-                            x-show="(feedback.mistakes && feedback.mistakes.length > 0) || (feedback.tips && feedback.tips.length > 0)">
+                        <div class="p-6 md:p-8 border shadow-sm transition-colors"
+                            x-show="(feedback.mistakes && feedback.mistakes.length > 0) || (feedback.tips && feedback.tips.length > 0)"
+                            :class="{
+                                'bg-[#264653]/5 border-[#264653]/10 rounded-2xl': userAgeGroup === 'child',
+                                'bg-[#111] border-[#333] rounded-none': userAgeGroup === 'teen'
+                            }">
 
-                            <h4
-                                class="font-bold text-indigo-900 mb-6 uppercase text-sm tracking-wider flex items-center gap-2 border-b border-indigo-100 pb-2">
+                            <h4 class="font-bold mb-6 uppercase text-sm tracking-wider flex items-center gap-2 border-b transition-colors pb-2"
+                                :class="{
+                                    'text-[#264653] border-[#264653]/10': userAgeGroup === 'child',
+                                    'text-[#E5E5E5] border-[#333]': userAgeGroup === 'teen'
+                                }">
                                 <span>🔍</span> Podrobná analýza chyb a doporučení
                             </h4>
 
                             <!-- Part 1: Mistakes (Module 1) -->
                             <template x-if="feedback.mistakes && feedback.mistakes.length > 0">
                                 <div class="mb-8">
-                                    <h5
-                                        class="text-xs font-bold text-red-800/70 uppercase mb-3 flex items-center gap-2">
+                                    <h5 class="text-xs font-bold uppercase mb-3 flex items-center gap-2 transition-colors"
+                                        :class="{
+                                            'text-[#E8722A]': userAgeGroup === 'child',
+                                            'text-red-500/70': userAgeGroup === 'teen'
+                                        }">
                                         <span>⚠️</span> Tvé chyby v situacích (Modul 1)
                                     </h5>
-                                    <div class="space-y-3">
+                                    <div class="space-y-4">
                                         <template x-for="mistake in feedback.mistakes">
-                                            <div class="bg-white p-4 rounded-xl shadow-sm border border-red-100/50">
-                                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
-                                                    x-text="mistake.question"></div>
-                                                <div class="font-medium text-slate-900 mb-2 flex items-start gap-2">
-                                                    <span class="text-red-500 mt-1 text-xs">❌</span>
+                                            <div class="p-4 shadow-sm border transition-colors" :class="{
+                                                    'bg-white border-[#264653]/10 rounded-xl': userAgeGroup === 'child',
+                                                    'bg-[#111] border-[#333] rounded-none': userAgeGroup === 'teen'
+                                                }">
+                                                <div class="text-[10px] font-bold uppercase tracking-widest mb-1 transition-colors"
+                                                    :class="{
+                                                        'text-[#264653]/50': userAgeGroup === 'child',
+                                                        'text-[#6B7280]': userAgeGroup === 'teen'
+                                                    }" x-text="mistake.question"></div>
+                                                <div class="font-medium mb-2 flex items-start gap-2" :class="{
+                                                        'text-[#264653]': userAgeGroup === 'child',
+                                                        'text-[#E5E5E5]': userAgeGroup === 'teen'
+                                                    }">
+                                                    <span class="mt-1 text-xs">❌</span>
                                                     <span x-text="mistake.answer"
-                                                        class="text-red-700 font-semibold"></span>
+                                                        class="font-semibold text-red-600"></span>
                                                 </div>
-                                                <div
-                                                    class="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border-l-2 border-indigo-200">
-                                                    <span
-                                                        class="font-semibold text-indigo-900 block mb-1">Doporučení:</span>
+                                                <div class="text-sm p-3 border-l-2 transition-colors" :class="{
+                                                        'bg-[#FFF8F0] text-[#264653] border-[#E8722A] rounded-r-lg': userAgeGroup === 'child',
+                                                        'bg-[#0a0a0a] text-[#6B7280] border-[#BFFF00]': userAgeGroup === 'teen'
+                                                    }">
+                                                    <span class="font-semibold block mb-1" :class="{
+                                                            'text-[#E8722A]': userAgeGroup === 'child',
+                                                            'text-[#BFFF00] uppercase text-[10px] tracking-widest': userAgeGroup === 'teen'
+                                                        }">Doporučení:</span>
                                                     <span x-text="mistake.feedback"></span>
                                                 </div>
                                             </div>
@@ -498,13 +848,22 @@
                             <!-- Part 2: Tips (Module 2 / General) -->
                             <template x-if="feedback.tips && feedback.tips.length > 0">
                                 <div>
-                                    <h5
-                                        class="text-xs font-bold text-indigo-800/70 uppercase mb-3 flex items-center gap-2">
+                                    <h5 class="text-xs font-bold uppercase mb-3 flex items-center gap-2 transition-colors"
+                                        :class="{
+                                            'text-[#2A9D8F]': userAgeGroup === 'child',
+                                            'text-[#BFFF00]/70': userAgeGroup === 'teen'
+                                        }">
                                         <span>💡</span> Tipy pro lepší wellbeing (Modul 2)
                                     </h5>
-                                    <ul class="bg-white p-5 rounded-xl border border-indigo-100 space-y-3 shadow-sm">
+                                    <ul class="p-5 border space-y-3 shadow-sm transition-colors" :class="{
+                                            'bg-white border-[#264653]/10 rounded-xl': userAgeGroup === 'child',
+                                            'bg-[#111] border-[#333] rounded-none': userAgeGroup === 'teen'
+                                        }">
                                         <template x-for="tip in feedback.tips">
-                                            <li class="flex items-start gap-3 text-slate-700 text-sm">
+                                            <li class="flex items-start gap-3 text-sm transition-colors" :class="{
+                                                    'text-[#264653]': userAgeGroup === 'child',
+                                                    'text-[#6B7280]': userAgeGroup === 'teen'
+                                                }">
                                                 <span class="text-green-500 mt-1">✓</span>
                                                 <span x-text="tip"></span>
                                             </li>
@@ -516,26 +875,50 @@
 
 
                         <!-- Task 2 Feedback (Planner) -->
-                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-100" x-show="feedback.planner">
-                            <h4
-                                class="font-bold text-blue-900 mb-2 uppercase text-xs tracking-wider flex items-center gap-2">
+                        <div class="p-6 border transition-all" x-show="feedback.planner" :class="{
+                                'bg-[#264653]/5 border-[#264653]/10 rounded-2xl': userAgeGroup === 'child',
+                                'bg-[#111] border-[#333] rounded-none': userAgeGroup === 'teen'
+                            }">
+                            <h4 class="font-bold mb-3 uppercase text-xs tracking-wider flex items-center gap-2 transition-colors"
+                                :class="{
+                                    'text-[#264653]': userAgeGroup === 'child',
+                                    'text-[#BFFF00]': userAgeGroup === 'teen'
+                                }">
                                 <span>📅</span> Hodnocení dne (Modul 2)
                             </h4>
-                            <p class="text-slate-700 text-sm leading-relaxed" x-text="feedback.planner"></p>
+                            <p class="text-sm leading-relaxed transition-colors" :class="{
+                                    'text-[#264653]/80': userAgeGroup === 'child',
+                                    'text-[#6B7280]': userAgeGroup === 'teen'
+                                }" x-text="feedback.planner"></p>
                         </div>
 
                         <!-- Success Fallback (if no mistakes/tips) -->
-                        <div class="bg-green-50 p-6 rounded-xl border border-green-100 text-center"
-                            x-show="(!feedback.mistakes || feedback.mistakes.length === 0) && (!feedback.tips || feedback.tips.length === 0)">
-                            <span class="text-4xl block mb-2">🌟</span>
-                            <h4 class="font-bold text-green-900 mb-2">Fantastická práce!</h4>
-                            <p class="text-green-800 text-sm">Nenašli jsme žádné zásadní chyby. Jsi vzorem digitální
-                                bezpečnosti!</p>
+                        <div class="p-8 text-center transition-all border"
+                            x-show="(!feedback.mistakes || feedback.mistakes.length === 0) && (!feedback.tips || feedback.tips.length === 0)"
+                            :class="{
+                                'bg-[#2A9D8F]/10 border-[#2A9D8F]/20 rounded-2xl': userAgeGroup === 'child',
+                                'bg-[#BFFF00]/5 border-[#BFFF00]/20 rounded-none': userAgeGroup === 'teen'
+                            }">
+                            <span class="text-4xl block mb-4">🌟</span>
+                            <h4 class="font-bold mb-2 transition-colors" :class="{
+                                    'text-[#2A9D8F] font-caveat text-3xl': userAgeGroup === 'child',
+                                    'text-[#BFFF00] uppercase tracking-widest': userAgeGroup === 'teen'
+                                }">Fantastická práce!</h4>
+                            <p class="text-sm transition-colors" :class="{
+                                    'text-[#2A9D8F]': userAgeGroup === 'child',
+                                    'text-[#6B7280]': userAgeGroup === 'teen'
+                                }">Nenašli jsme žádné zásadní chyby. Jsi vzorem digitální bezpečnosti!</p>
                         </div>
 
-                        <div class="text-center pt-8 border-t border-slate-100">
+                        <div class="text-center pt-8 border-t transition-colors" :class="{
+                                'border-[#264653]/10': userAgeGroup === 'child',
+                                'border-[#333]': userAgeGroup === 'teen'
+                            }">
                             <button @click="resetApp()"
-                                class="text-slate-500 hover:text-slate-800 font-semibold transition-colors text-sm">
+                                class="font-semibold transition-all text-sm uppercase tracking-widest" :class="{
+                                    'text-[#E8722A] hover:text-[#d4651f] hover:scale-105': userAgeGroup === 'child',
+                                    'text-[#6B7280] hover:text-[#BFFF00]': userAgeGroup === 'teen'
+                                }">
                                 ↺ Resetovat a zkusit znovu
                             </button>
                         </div>

@@ -32,7 +32,17 @@ document.addEventListener('alpine:init', () => {
             module2Completed: false
         },
 
+        showAgeGate: false,
+        userAgeGroup: null, // 'child' (11-14) or 'teen' (15+)
+
         init() {
+            const ageGroup = localStorage.getItem('bnn_age_group');
+            if (!ageGroup) {
+                this.showAgeGate = true;
+            } else {
+                this.userAgeGroup = ageGroup;
+            }
+
             const savedState = localStorage.getItem('bnn_app_state');
             if (savedState) {
                 const parsed = JSON.parse(savedState);
@@ -52,6 +62,12 @@ document.addEventListener('alpine:init', () => {
 
         setView(view) {
             this.currentView = view;
+        },
+
+        acceptAgeGate(group) {
+            this.userAgeGroup = group;
+            this.showAgeGate = false;
+            localStorage.setItem('bnn_age_group', group);
         },
 
         resetApp() {
@@ -214,6 +230,15 @@ document.addEventListener('alpine:init', () => {
             } else {
                 this.startNewQuiz();
             }
+
+            // HYDRATE: Ensure titles/descriptions are up to date from the static data (fix for old localStorage)
+            this.activeScenarios.forEach(s => {
+                const fresh = SCENARIOS.find(src => src.id === s.id);
+                if (fresh) {
+                    s.title = fresh.title;
+                    s.description = fresh.description;
+                }
+            });
         },
 
         startNewQuiz() {
