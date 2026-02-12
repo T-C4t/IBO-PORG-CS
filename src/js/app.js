@@ -34,6 +34,7 @@ document.addEventListener('alpine:init', () => {
 
         showAgeGate: false,
         userAgeGroup: null, // 'child' (11-14) or 'teen' (15+)
+        showDebug: false,
 
         init() {
             const ageGroup = localStorage.getItem('bnn_age_group');
@@ -114,16 +115,19 @@ document.addEventListener('alpine:init', () => {
                 if (ans.type === 'ideal') {
                     points = 15;
                 } else {
+                    // Find the ideal solution text for this scenario
+                    const scenario = activeScenarios[index] || SCENARIOS.find(s => s.id === ans.scenarioId);
+                    const idealOption = scenario?.options?.find(o => o.type === 'ideal');
+
                     // Collect Feedback for OK/BAD answers
                     mistakes.push({
                         question: questionTitle,
                         answer: ans.text,
                         feedback: ans.feedback,
-                        type: ans.type
+                        type: ans.type,
+                        correctOption: idealOption ? idealOption.text : '',
+                        correctReason: idealOption ? idealOption.feedback : ''
                     });
-
-                    // Removed: if (ans.feedback) tips.push(ans.feedback);
-                    // To prevent duplication in final report.
 
                     if (ans.type === 'ok') points = 5;
                     else if (ans.type === 'bad') points = -10;
@@ -198,6 +202,98 @@ document.addEventListener('alpine:init', () => {
             else baseWellbeing = "Varování: Technologie ti berou příliš mnoho času.";
 
             this.feedback.wellbeing = baseWellbeing;
+        },
+
+        /**
+         * Radar Chart Initialization
+         */
+        radarChart: null,
+        initRadarChart() {
+            if (this.radarChart) this.radarChart.destroy();
+
+            const canvas = document.getElementById('radarChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            const isChild = this.userAgeGroup === 'child';
+            const color = isChild ? '#E8722A' : '#BFFF00';
+            const gridColor = isChild ? 'rgba(38, 70, 83, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+            const textColor = isChild ? '#264653' : '#6B7280';
+
+            this.radarChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Bezpečnost', 'Empatie', 'Wellbeing'],
+                    datasets: [{
+                        label: 'Kompetence',
+                        data: [this.profile.safety, this.profile.empathy, this.profile.wellbeing],
+                        backgroundColor: isChild ? 'rgba(232, 114, 42, 0.2)' : 'rgba(191, 255, 0, 0.2)',
+                        borderColor: color,
+                        pointBackgroundColor: color,
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: color,
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    scales: {
+                        r: {
+                            min: 0,
+                            max: 100,
+                            ticks: { display: false, stepSize: 20 },
+                            grid: { color: gridColor },
+                            angleLines: { color: gridColor },
+                            pointLabels: {
+                                color: textColor,
+                                font: {
+                                    family: isChild ? 'Caveat' : 'Inter',
+                                    size: isChild ? 16 : 10,
+                                    weight: isChild ? 'bold' : 'normal'
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        },
+
+        // --- Debug Methods (Dev Only) ---
+        debugFinishM1() {
+            const quizState = {
+                activeScenarios: SCENARIOS.slice(0, 5),
+                currentScenarioIndex: 5,
+                answers: SCENARIOS.slice(0, 5).map(s => ({
+                    ...s.options[0],
+                    scenarioId: s.id,
+                    category: s.category
+                }))
+            };
+            localStorage.setItem('bnn_quiz_state', JSON.stringify(quizState));
+            this.appStorage.module1Completed = true;
+            this.saveState();
+            this.setView('menu');
+        },
+
+        debugFinishM2() {
+            const fullGrid = new Array(48).fill('sleep');
+            localStorage.setItem('bnn_planner_state', JSON.stringify({ grid: fullGrid }));
+            this.appStorage.module2Completed = true;
+            this.saveState();
+            this.setView('menu');
+        },
+
+        debugShowReport() {
+            this.debugFinishM1();
+            this.debugFinishM2();
+            this.calculateProfile();
+            this.setView('results');
         }
 
     }));

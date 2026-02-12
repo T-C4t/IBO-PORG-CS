@@ -10,44 +10,44 @@
 *   **Interaktivita:** Udržet pozornost účastníků workshopu pomocí gamifikace a okamžité zpětné vazby.
 
 ### Cílová skupina
-*   **Primární:** Děti (11-14 let) - aplikace pro ně má speciální "dětský" vizuální režim.
-*   **Sekundární:** Dospívající (15+) - aplikace nabízí "dospělý", více seriózní režim.
+*   **Děti (11-14 let):** Speciální "dětský" vizuální režim (`userAgeGroup === 'child'`).
+*   **Dospívající (15+):** Seriózní "dospělý" režim (`userAgeGroup === 'teen'`).
 
 ## 2. Funkcionalita aplikace
 
-Aplikace se skládá ze dvou hlavních modulů:
+Aplikace je SPA (Single Page Application) postavená na **Alpine.js**.
 
 ### Modul 1: Reakce na situace (Kvíz)
-Série interaktivních scénářů, které simulují reálné problémy na sociálních sítích.
-*   Uživatel řeší situace jako "Kyberšikana", "Neznámý kontakt" nebo "Nevhodná fotka".
-*   Každá situace má 3-6 možných řešení.
-*   Okamžitá zpětná vazba (Feedback) vysvětluje, proč je dané řešení ideální, přijatelné, nebo nevhodné.
+*   **Účel:** Simulace rizikových scénářů.
+*   **Kód:** Implementováno v `Alpine.data('quizStore', ...)` v `src/js/app.js`.
+*   **Data:** Scénáře definovány v `SCENARIOS` v `src/js/data.js`.
+*   **Logika:** 12 náhodně řazených scénářů, 3-6 možností s typy `ideal`, `ok`, `bad`.
 
 ### Modul 2: Můj Den (Plánovač)
-Nástroj pro vizualizaci a analýzu denního režimu.
-*   Uživatel skládá svůj typický den z aktivit (Spánek, Škola, Jídlo, Online zábava, Offline koníčky...).
-*   Aplikace v reálném čase počítá "Screen Time" (čas u obrazovek).
-*   Na závěr aplikace vyhodnotí vyváženost dne a poskytne doporučení (např. pokud screen time přesáhne 2 hodiny).
+*   **Účel:** Audit denního režimu a screen time.
+*   **Kód:** Implementováno v `Alpine.data('plannerStore', ...)` v `src/js/app.js`.
+*   **Data:** Aktivity definovány v `ACTIVITIES` v `src/js/data.js`.
+*   **Logika:** 48 slotů (po 30 min), výpočet `totalPassiveScreenTime`.
 
-### Další klíčové funkce
-*   **Age Gate:** Rozcestník na začátku aplikace, který podle věku uživatele přepne design a tón komunikace.
-*   **Bezpečnost:** Aplikace neukládá žádná osobní data na server (vše běží v prohlížeči).
-*   **Reset:** Možnost rychle smazat progress a začít znovu (pro další skupinu na workshopu).
+### Finální Report (Kompetenční Profil)
+*   **Účel:** Souhrnná analýza (Radar Chart).
+*   **Logika:** Metoda `calculateProfile()` v `src/js/app.js`.
+*   **Kategorie:** Bezpečnost (Safety), Empatie (Empathy), Wellbeing.
 
-## 3. Stav projektu
+## 3. Technické Specifikace
+*   **Frontend:** HTML5, Tailwind CSS, Alpine.js, Chart.js.
+*   **State Management:** `localStorage` (klíče `bnn_app_state`, `bnn_quiz_state`, `bnn_planner_state`).
+*   **Bezpečnost:** Žádný backend, veškerá data zůstávají v prohlížeči.
 
-Aplikace je ve fázi **pokročilého funkčního prototypu (verze 1.0)**.
-*   Všechny klíčové funkce jsou implementovány a funkční.
-*   Obsahuje 12 detailně zpracovaných vzdělávacích scénářů.
-*   Plánovač dne je plně funkční včetně validace a vyhodnocení.
-*   Design je responsivní (mobil, tablet, desktop).
+## 4. Stav projektu
+Aplikace je ve verzi **1.1**.
 
-### Co je hotovo
-*   ✅ Kompletní workflow (Age Gate -> Menu -> Kvíz/Plánovač -> Vyhodnocení).
-*   ✅ Implementace všech 12 scénářů s feedbackem.
-*   ✅ Logika plánovače dne a výpočtu screen time.
-*   ✅ Vizuální styly pro obě věkové skupiny.
+### Novinky v aktuální verzi
+*   **Podrobná analýza chyb:** Report nyní obsahuje "Optimální řešení" pro chybně zodpovězené otázky.
+*   **Barevné kódování:** Kategorie v kvízu jsou vizuálně odlišeny barvami (Child vs Teen schémata).
+*   **Refaktorovaný Scoring:** Přesnější výpočet kompetencí na základě typu odpovědi a pasivního screen timu.
 
-## 4. Historie změn
+## 5. Historie změn
 *   **2024:** Vytvoření detailního PRD a specifikací.
-*   **Q4 2024:** Vývoj prototypu, implementace scénářů.
+*   **Q4 2024:** Vývoj prototypu (v1.0).
+*   **Q1 2026:** Implementace pokročilé analýzy, vizuálních témat a optimalizace pro AI (v1.1).

@@ -469,20 +469,20 @@ const SCENARIOS = [
  */
 const ACTIVITIES = [
     // Essentials (Povinné)
-    { id: 'sleep', name: 'Spánek (Regenerace)', type: 'mandatory', icon: 'M', color: 'bg-indigo-100 border-indigo-200' },
-    { id: 'food', name: 'Jídlo', type: 'mandatory', icon: 'J', color: 'bg-green-100 border-green-200' },
-    { id: 'school', name: 'Škola / Práce', type: 'mandatory', icon: 'Š', color: 'bg-blue-100 border-blue-200' },
-    { id: 'hygiene', name: 'Hygiena', type: 'mandatory', icon: 'H', color: 'bg-cyan-100 border-cyan-200' },
+    { id: 'sleep', name: 'Spánek (Regenerace)', type: 'mandatory', icon: 'moon', color: 'bg-indigo-100 border-indigo-200' },
+    { id: 'food', name: 'Jídlo', type: 'mandatory', icon: 'utensils', color: 'bg-green-100 border-green-200' },
+    { id: 'school', name: 'Škola / Práce', type: 'mandatory', icon: 'book-open', color: 'bg-blue-100 border-blue-200' },
+    { id: 'hygiene', name: 'Hygiena', type: 'mandatory', icon: 'bath', color: 'bg-cyan-100 border-cyan-200' },
 
     // Lifestyle (Volitelné)
-    { id: 'sport', name: 'Pohyb (Offline)', type: 'optional', icon: 'P', color: 'bg-orange-100 border-orange-200' },
-    { id: 'creative', name: 'Tvoření / Hobby', type: 'optional', icon: 'T', color: 'bg-pink-100 border-pink-200' },
-    { id: 'social_off', name: 'Socializace (Offline)', type: 'optional', icon: 'S', color: 'bg-yellow-100 border-yellow-200' },
-    { id: 'relax', name: 'Odpočinek (Bez digi)', type: 'optional', icon: 'O', color: 'bg-purple-100 border-purple-200' },
+    { id: 'sport', name: 'Pohyb (Offline)', type: 'optional', icon: 'activity', color: 'bg-orange-100 border-orange-200' },
+    { id: 'creative', name: 'Tvoření / Hobby', type: 'optional', icon: 'palette', color: 'bg-pink-100 border-pink-200' },
+    { id: 'social_off', name: 'Socializace (Offline)', type: 'optional', icon: 'users', color: 'bg-yellow-100 border-yellow-200' },
+    { id: 'relax', name: 'Odpočinek (Bez digi)', type: 'optional', icon: 'leaf', color: 'bg-purple-100 border-purple-200' },
 
     // Digital Categories - Split for better analysis
-    { id: 'screen_passive', name: 'Pasivní Scrollování', type: 'optional', icon: 'D-', color: 'bg-red-100 border-red-200' },
-    { id: 'screen_active', name: 'Aktivní Digi (Práce/Hra)', type: 'optional', icon: 'D+', color: 'bg-blue-100 border-blue-200' }, // Gaming/Chatting creates value/connection
+    { id: 'screen_passive', name: 'Pasivní Scrollování', type: 'optional', icon: 'smartphone', color: 'bg-red-100 border-red-200' },
+    { id: 'screen_active', name: 'Aktivní Digi (Práce/Hra)', type: 'optional', icon: 'gamepad-2', color: 'bg-blue-100 border-blue-200' }, // Gaming/Chatting creates value/connection
 
-    { id: 'transit', name: 'Cestování', type: 'optional', icon: 'C', color: 'bg-gray-100 border-gray-200' },
+    { id: 'transit', name: 'Cestování', type: 'optional', icon: 'bus', color: 'bg-gray-100 border-gray-200' },
 ];

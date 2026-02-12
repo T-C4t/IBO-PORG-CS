@@ -1,47 +1,69 @@
 # Technická Architektura
 
 ## 1. Přehled
-Aplikace "Bezpečně na Netu" je navržena jako jednoduchá, lehká klientská webová aplikace (Client-side only). Nevyžaduje backend server pro svou funkčnost, což usnadňuje nasazení a údržbu.
+Aplikace "Bezpečně na Netu" je lehká klientská webová aplikace (Client-side only). Veškerá logika a data jsou zpracovávána v prohlížeči uživatele.
 
 ## 2. Technický Stack
+*   **Framework:** Alpine.js (State Management & Reaktivita).
+*   **Styling:** Tailwind CSS (Utility classes).
+*   **Grafy:** Chart.js (Radar Chart pro kompetenční profil).
+*   **Ikony:** Lucide Icons.
 
-### Core
-*   **HTML5:** Sémantická struktura stránek.
-*   **JavaScript (ES6+):** Aplikační logika.
-*   **CSS3:** Stylování.
+## 3. State Management (Persistence)
+Aplikace využívá `localStorage` pro uchování stavu mezi jednotlivými moduly.
 
-### Knihovny a Frameworky
-*   **Alpine.js:** Lehký JavaScript framework pro reaktivitu a správu stavu (State Management). Načítán přes CDN.
-*   **Tailwind CSS:** Utility-first CSS framework pro rychlý a konsistentní design. Načítán přes CDN.
+| Klíč v localStorage | Obsah |
+| :--- | :--- |
+| `bnn_age_group` | Vybraná věková skupina (`child` nebo `teen`). |
+| `bnn_app_state` | Celkový progres (`module1Completed`, `module2Completed`). |
+| `bnn_quiz_state` | Aktuální index otázky, zamíchané pořadí a vybrané odpovědi. |
+| `bnn_planner_state` | Mřížka 48 aktivit denního plánovače. |
+| `bnn_profile` | Vypočítané skóre kompetencí (Safety, Empathy, Wellbeing). |
 
-### Data
-*   **Lokální úložiště:** Progress uživatele se ukládá do `localStorage` prohlížeče. To zajišťuje, že data přežijí refresh stránky, ale nejsou odesílána na žádný server.
-*   **Žádná databáze:** Aplikace nepoužívá externí databázi. Všechna vzdělávací data (scénáře, aktivity) jsou uložena přímo v kódu (`src/js/data.js`).
+## 4. Datové Struktury (`src/js/data.js`)
 
-## 3. Struktura souborů
-
+### Scénáře (`SCENARIOS`)
+Pole objektů s následující strukturou:
+```javascript
+{
+    id: string,
+    category: 'safety' | 'empathy' | 'wellbeing',
+    title: string,
+    description: string,
+    options: Array<{
+        text: string,
+        type: 'ideal' | 'ok' | 'bad',
+        feedback: string
+    }>
+}
 ```
-/
-├── index.html          # Hlavní vstupní bod aplikace
-├── src/
-│   ├── js/
-│   │   ├── app.js      # Hlavní aplikační logika (Alpine.js komponenty)
-│   │   └── data.js     # Definice scénářů a aktivit (Data Layer)
-│   └── css/            # (Volitelné) Vlastní CSS styly
-├── docs/               # Dokumentace projektu
-└── archive/            # Starší verze dokumentace a podklady
+
+### Aktivity (`ACTIVITIES`)
+Pole aktivit pro plánovač:
+```javascript
+{
+    id: string,
+    name: string,
+    type: 'mandatory' | 'optional',
+    icon: string,
+    color: string (Tailwind classes)
+}
 ```
 
-## 4. Klíčové komponenty
+## 5. Scoring Logic (`calculateProfile`)
+Výpočet probíhá v `src/js/app.js` po dokončení obou modulů.
 
-### Data Layer (`data.js`)
-Obsahuje konstanty `SCENARIOS` (pole objektů pro kvíz) a `ACTIVITIES` (pole objektů pro plánovač). Tento soubor slouží jako "databáze" a je oddělen od logiky pro snadnější úpravy obsahu.
+*   **Základní skóre:** 50 bodů v každé kategorii.
+*   **Kvíz:**
+    *   `ideal` = +15 bodů
+    *   `ok` = +5 bodů
+    *   `bad` = -10 bodů
+*   **Plánovač:**
+    *   Pasivní screen time > 2h (4 bloky) = Srážka Wellbeingu (-5 bodů za každých 30 min navíc).
+    *   Aktivní screen time = Bonus k Wellbeing (+10 bodů).
+    *   Obrazovka před spaním = Výrazná srážka Wellbeing (-15 bodů).
 
-### Logic Layer (`app.js`)
-Obsahuje logiku v Alpine.js:
-*   `game()`: Hlavní komponenta řídící stav aplikace.
-*   **State:** Uchovává aktuální obrazovku (`screen`), věk uživatele (`isChild`), progress v kvízu a data plánovače.
-*   **Methods:** Funkce pro přepínání obrazovek, vyhodnocování odpovědí a výpočet statistik.
-
-## 5. Nasazení (Deployment)
-Aplikace je "static site". Může být hostována na jakémkoli webovém serveru (Apache, Nginx) nebo službách jako GitHub Pages, Netlify či Vercel. Stačí naservírovat složku projektu.
+## 6. Barevná Schémata
+Dynamicky přepínána v `index.html` na základě `userAgeGroup`:
+*   **Child:** Oranžová/Tyrkysová (`paper-bg`), hravá typografie (`Caveat`).
+*   **Teen:** Černá/Neonově zelená (`teen-light-bg`), minimalistický high-tech design.
