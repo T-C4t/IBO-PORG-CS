@@ -1,52 +1,53 @@
-// Application Logic (Alpine.js)
+// Application Logic (Alpine.js) - Educational Edition
 
 document.addEventListener('alpine:init', () => {
 
     /**
      * Global App Store
-     * Manages high-level state: age mode, current view, persistence.
+     * Manages 'Modules' and overall progression.
      */
     Alpine.data('app', () => ({
-        ageMode: null, // 'child' | 'adult'
-        currentView: 'age-gate', // 'age-gate', 'menu', 'task-1', 'task-2'
+        currentView: 'menu',
 
-        // Simple persistence object to track overall progress
+        // Competency Profile (0-100 scale per category)
+        profile: {
+            safety: 0,
+            empathy: 0,
+            wellbeing: 0
+        },
+
+        // Detailed feedback strings
+        feedback: {
+            safety: '',
+            empathy: '',
+            wellbeing: '',
+            planner: '', // NEW: Specific feedback for Task 2
+            mistakes: [], // NEW: Array of objects { question, answer, feedback, type }
+            tips: []
+        },
+
+        // Progress Tracking
         appStorage: {
-            task1Completed: false,
-            task2Completed: false
+            module1Completed: false,
+            module2Completed: false
         },
 
         init() {
-            // Load state from localStorage if available
             const savedState = localStorage.getItem('bnn_app_state');
             if (savedState) {
                 const parsed = JSON.parse(savedState);
-                this.ageMode = parsed.ageMode;
                 this.appStorage = parsed.appStorage || this.appStorage;
 
-                // Navigate to menu if mode was already selected
-                if (this.ageMode) {
-                    this.currentView = 'menu';
-                }
-
-                // Recalculate grade if tasks are done
-                if (this.appStorage.task1Completed && this.appStorage.task2Completed) {
-                    this.calculateGrade();
+                if (this.appStorage.module1Completed && this.appStorage.module2Completed) {
+                    this.calculateProfile();
                 }
             }
         },
 
         saveState() {
             localStorage.setItem('bnn_app_state', JSON.stringify({
-                ageMode: this.ageMode,
                 appStorage: this.appStorage
             }));
-        },
-
-        setAgeMode(mode) {
-            this.ageMode = mode;
-            this.currentView = 'menu';
-            this.saveState();
         },
 
         setView(view) {
@@ -54,136 +55,212 @@ document.addEventListener('alpine:init', () => {
         },
 
         resetApp() {
-            if (confirm('Opravdu chceš začít úplně od začátku? Vše se vymaže.')) {
-                localStorage.removeItem('bnn_app_state');
-                localStorage.removeItem('bnn_quiz_state');
-                localStorage.removeItem('bnn_planner_state');
+            if (confirm('Opravdu resetovat celý postup?')) {
+                localStorage.clear();
                 location.reload();
             }
         },
 
-        // Helper to mark tasks as complete (called from child stores)
-        completeTask(taskId) {
-            if (taskId === 1) this.appStorage.task1Completed = true;
-            if (taskId === 2) this.appStorage.task2Completed = true;
-
-            // Calculate grade if both done
-            if (this.appStorage.task1Completed && this.appStorage.task2Completed) {
-                this.calculateGrade();
-            }
+        completeModule(moduleId) {
+            if (moduleId === 1) this.appStorage.module1Completed = true;
+            if (moduleId === 2) this.appStorage.module2Completed = true;
 
             this.saveState();
 
-            // Check if both are done
-            if (this.appStorage.task1Completed && this.appStorage.task2Completed) {
-                // Determine if we should show final results immediately or waiting for user
-                // For now, let's just make the view available or show a notification?
-                // PRD/Prompt implies automatic transition or availability. 
-                // Let's auto-transition if they are on a task view, or wait if menu.
-                // Actually prompt says "automatically appear or become available".
-                // Safest UX: Show a "Final Evaluation Ready" button in Menu, or redirect.
-                // Let's add a check in Menu view to show the "Final Result" button.
+            if (this.appStorage.module1Completed && this.appStorage.module2Completed) {
+                this.calculateProfile();
             }
         },
 
-        grade: null,
-        quizBreakdown: { ideal: 0, ok: 0, bad: 0 },
-        plannerBreakdown: { hours: 0, isOverLimit: false },
-
-        calculateGrade() {
-            // 1. Quiz Score Breakdown
+        /**
+         * Core Logic: Competency Calculation
+         */
+        calculateProfile() {
+            // --- Analysis 1: Quiz ---
             const quizState = JSON.parse(localStorage.getItem('bnn_quiz_state') || '{}');
             const answers = quizState.answers || [];
+            const activeScenarios = quizState.activeScenarios || [];
 
-            this.quizBreakdown = {
-                ideal: answers.filter(a => a && a.type === 'ideal').length,
-                ok: answers.filter(a => a && a.type === 'ok').length,
-                bad: answers.filter(a => a && a.type === 'bad').length
-            };
+            let safetyScore = 50;
+            let empathyScore = 50;
+            let wellbeingScore = 50;
 
-            // 2. Planner Score Breakdown
+            let mistakes = [];
+            let tips = [];
+
+            answers.forEach((ans, index) => {
+                if (!ans) return;
+
+                // Find the question title either from saved scenario or by index if robust
+                const questionTitle = activeScenarios[index] ? activeScenarios[index].title : "Otázka " + (index + 1);
+
+                let points = 0;
+                if (ans.type === 'ideal') {
+                    points = 15;
+                } else {
+                    // Collect Feedback for OK/BAD answers
+                    mistakes.push({
+                        question: questionTitle,
+                        answer: ans.text,
+                        feedback: ans.feedback,
+                        type: ans.type
+                    });
+
+                    // Removed: if (ans.feedback) tips.push(ans.feedback);
+                    // To prevent duplication in final report.
+
+                    if (ans.type === 'ok') points = 5;
+                    else if (ans.type === 'bad') points = -10;
+                }
+
+                if (ans.category === 'safety') safetyScore += points;
+                if (ans.category === 'empathy') empathyScore += points;
+                if (ans.category === 'wellbeing') wellbeingScore += points;
+            });
+
+            // --- Analysis 2: Day Audit ---
             const plannerState = JSON.parse(localStorage.getItem('bnn_planner_state') || '{}');
             const grid = plannerState.grid || [];
-            const screenBlocks = grid.filter(id => id === 'screen').length;
-            const hours = screenBlocks * 0.5;
 
-            this.plannerBreakdown = {
-                hours: hours,
-                isOverLimit: hours > 2
-            };
+            const passiveBlocks = grid.filter(id => id === 'screen_passive').length;
+            const activeBlocks = grid.filter(id => id === 'screen_active').length;
 
-            // Calculate Grade (0-5 points scale)
-            // Quiz: Max 3 points (based on ideal answers, but since we have 3 scenarios, it works)
-            // Planner: Max 2 points if within limit
-            const quizPoints = Math.min(this.quizBreakdown.ideal, 3);
-            const plannerPoints = this.plannerBreakdown.isOverLimit ? 0 : 2;
+            let plannerFeedback = [];
 
-            const totalScore = quizPoints + plannerPoints;
+            if (passiveBlocks > 4) {
+                wellbeingScore -= (passiveBlocks - 4) * 5;
+                const hours = passiveBlocks * 0.5;
+                plannerFeedback.push(`⚠️ Trávíš ${hours}h pasivním scrollováním (doportučeno max 2h).`);
+                tips.push("Omez pasivní scrollování a nastav si limity aplikací.");
+            } else {
+                const hours = passiveBlocks * 0.5;
+                plannerFeedback.push(`✅ Tvůj čas na sítích (${hours}h) je v normě.`);
+            }
 
-            if (totalScore >= 5) this.grade = 'A';
-            else if (totalScore === 4) this.grade = 'B';
-            else if (totalScore === 3) this.grade = 'C';
-            else if (totalScore === 2) this.grade = 'D';
-            else this.grade = 'F';
+            if (activeBlocks > 0 && activeBlocks < 6) {
+                wellbeingScore += 10;
+                plannerFeedback.push(`🎨 Skvělé! Využíváš technologie i aktivně.`);
+            }
+
+            const firstSleepIndex = grid.indexOf('sleep');
+            if (firstSleepIndex > 0) {
+                const preSleepActivity = grid[firstSleepIndex - 1];
+                if (preSleepActivity === 'screen_passive' || preSleepActivity === 'screen_active') {
+                    wellbeingScore -= 15;
+                    plannerFeedback.push("⚠️ Pozor: Obrazovka těsně před spaním narušuje spánek.");
+                    tips.push("Hodinu před spaním odlož telefon, zlepšíš si kvalitu spánku.");
+                } else {
+                    plannerFeedback.push("✅ Chválíme: Před spaním si dáváš pauzu od displeje.");
+                }
+            }
+
+            this.profile.safety = Math.max(0, Math.min(100, safetyScore));
+            this.profile.empathy = Math.max(0, Math.min(100, empathyScore));
+            this.profile.wellbeing = Math.max(0, Math.min(100, wellbeingScore));
+
+            this.feedback.mistakes = mistakes;
+            this.feedback.tips = [...new Set(tips)];
+            this.feedback.planner = plannerFeedback.join(" "); // New visual feedback string for planner
+
+            this.generateFeedback();
+
+            localStorage.setItem('bnn_profile', JSON.stringify(this.profile));
         },
 
-        get finalFeedback() {
-            const grade = this.grade;
-            if (grade === 'A') return 'Fantastické! Jsi skutečný digitální mistr. 🏆';
-            if (grade === 'B') return 'Skvělá práce! Rozumíš tomu, jen malý kousek chyběl k dokonalosti.';
-            if (grade === 'C') return 'Dobrá práce, ale je tu prostor pro zlepšení. Zkus se zamyslet nad svým časem nebo reakcemi.';
-            if (grade === 'D') return 'Pozor! V online světě bys měl být opatrnější a hlídat si čas.';
-            return 'Fíha! Tohle se nepovedlo. Zkus si kurz projít znovu a naučit se víc o bezpečí.';
+        generateFeedback() {
+            if (this.profile.safety > 80) this.feedback.safety = "Výborné! Jsi digitální ninja, tvá hesla a data jsou v bezpečí.";
+            else if (this.profile.safety > 50) this.feedback.safety = "Standardní. Znáš základy, ale pozor na sofistikované podvody (phishing).";
+            else this.feedback.safety = "Rizikové. Doporučujeme okamžitě změnit hesla a nastavit dvoufázové ověření.";
+
+            if (this.profile.empathy > 80) this.feedback.empathy = "Máš skvělou emoční inteligenci. Pomáháš tvořit bezpečnější internet.";
+            else if (this.profile.empathy > 50) this.feedback.empathy = "Většinou reaguješ správně, ale nenech se strhnout davem k negativitě.";
+            else this.feedback.empathy = "Pozor na toxicitu. I online slova mohou ublížit skutečným lidem.";
+
+            let baseWellbeing = "";
+            if (this.profile.wellbeing > 80) baseWellbeing = "Máš to pod kontrolou! Technologie ti slouží, ne naopak.";
+            else if (this.profile.wellbeing > 50) baseWellbeing = "Tvůj digitální balanc je průměrný. Zkus více offline aktivit.";
+            else baseWellbeing = "Varování: Technologie ti berou příliš mnoho času.";
+
+            this.feedback.wellbeing = baseWellbeing;
         }
+
     }));
 
     /**
-     * Quiz Store (Task 1)
+     * Module 1 Store (Quiz/Analysis) with Randomization
      */
     Alpine.data('quizStore', () => ({
+        activeScenarios: [], // Shuffled copy
         currentScenarioIndex: 0,
         showFeedback: false,
         showResults: false,
-        currentFeedback: null,
-        answers: [], // Array to store user's result for each scenario
+        currentFeedbackBlock: null,
+        answers: [],
 
         init() {
-            // Load state if exists
             const saved = localStorage.getItem('bnn_quiz_state');
             if (saved) {
                 const parsed = JSON.parse(saved);
+                this.activeScenarios = parsed.activeScenarios || [];
                 this.currentScenarioIndex = parsed.currentScenarioIndex;
                 this.answers = parsed.answers || [];
-                // If they were done, show results
-                if (this.currentScenarioIndex >= SCENARIOS.length) {
+
+                // Consistency check
+                if (this.activeScenarios.length === 0) this.startNewQuiz();
+
+                if (this.currentScenarioIndex >= this.activeScenarios.length && this.activeScenarios.length > 0) {
                     this.showResults = true;
                 }
+            } else {
+                this.startNewQuiz();
+            }
+        },
+
+        startNewQuiz() {
+            // 1. Shuffle Scenarios
+            let scenarios = JSON.parse(JSON.stringify(SCENARIOS)); // Deep copy
+            this.shuffleArray(scenarios);
+
+            // 2. Shuffle Options within Scenarios
+            scenarios.forEach(s => this.shuffleArray(s.options));
+
+            this.activeScenarios = scenarios;
+            this.currentScenarioIndex = 0;
+            this.answers = [];
+            this.showResults = false;
+            this.saveState();
+        },
+
+        shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
             }
         },
 
         get scenario() {
-            return SCENARIOS[this.currentScenarioIndex];
+            return this.activeScenarios[this.currentScenarioIndex];
         },
 
         get progressPercentage() {
-            if (!SCENARIOS || SCENARIOS.length === 0) return 0;
-            return ((this.currentScenarioIndex) / SCENARIOS.length) * 100;
-        },
-
-        saveState() {
-            localStorage.setItem('bnn_quiz_state', JSON.stringify({
-                currentScenarioIndex: this.currentScenarioIndex,
-                answers: this.answers
-            }));
+            if (!this.activeScenarios.length) return 0;
+            return (this.currentScenarioIndex / this.activeScenarios.length) * 100;
         },
 
         selectAnswer(option) {
-            this.currentFeedback = option;
+            this.currentFeedbackBlock = option;
             this.showFeedback = true;
 
-            // Save answer if not already saved for this index
-            // (Simpler logic: just push/update current index)
-            this.answers[this.currentScenarioIndex] = option;
+            // Save answer WITH category context for the global calculator
+            const currentScenario = this.activeScenarios[this.currentScenarioIndex];
+
+            this.answers[this.currentScenarioIndex] = {
+                ...option, // text, type, feedback
+                scenarioId: currentScenario.id,
+                category: currentScenario.category
+            };
+
+            this.saveState();
         },
 
         nextScenario() {
@@ -191,73 +268,56 @@ document.addEventListener('alpine:init', () => {
             this.currentScenarioIndex++;
             this.saveState();
 
-            if (this.currentScenarioIndex >= SCENARIOS.length) {
-                this.finishQuiz();
+            if (this.currentScenarioIndex >= this.activeScenarios.length) {
+                this.finishModule();
             }
         },
 
-        finishQuiz() {
+        saveState() {
+            localStorage.setItem('bnn_quiz_state', JSON.stringify({
+                activeScenarios: this.activeScenarios, // Save order
+                currentScenarioIndex: this.currentScenarioIndex,
+                answers: this.answers
+            }));
+        },
+
+        finishModule() {
             this.showResults = true;
-            // Notify global app that task 1 is done
-            // access parent scope event or store? 
-            // In Alpine, we can dispatch an event or access global store if injected.
-            // But here we rely on the DOM structure or just saving locally.
-            // Better: Dispatch custom event that 'app' listens to, or update appStorage directly if accessible.
-            // Since we are inside x-data, $dispatch is best.
-            this.$dispatch('task-complete', { taskId: 1 });
+            this.$dispatch('module-complete', { moduleId: 1 });
         },
 
-        isPerfectScore() {
-            return this.answers.every(a => a.type === 'ideal');
-        },
-
-        restartQuiz() {
-            this.currentScenarioIndex = 0;
-            this.answers = [];
-            this.showResults = false;
-            this.showFeedback = false;
-            this.saveState();
+        restartModule() { // Renamed from restartQuiz to be consistent if called
+            this.startNewQuiz();
         }
     }));
 
     /**
-     * Planner Store (Task 2)
+     * Module 2 Store (Planner/Audit)
      */
     Alpine.data('plannerStore', () => ({
-        dayType: 'weekday', // 'weekday' | 'weekend'
-        grid: new Array(48).fill(null), // 48 blocks of 30 min
+        grid: new Array(48).fill(null),
         selectedActivityId: null,
         showResults: false,
         isDragging: false,
 
         init() {
-            // Load state if exists
             const saved = localStorage.getItem('bnn_planner_state');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                this.dayType = parsed.dayType || 'weekday';
                 this.grid = parsed.grid || new Array(48).fill(null);
-
-                // If grid is full and marked done, show results? Maybe not force it here.
             }
         },
 
         saveState() {
             localStorage.setItem('bnn_planner_state', JSON.stringify({
-                dayType: this.dayType,
                 grid: this.grid
             }));
         },
 
-        get mandatoryActivities() {
-            return ACTIVITIES.filter(a => a.type === 'mandatory');
-        },
+        // Helper Getters
+        get mandatoryActivities() { return ACTIVITIES.filter(a => a.type === 'mandatory'); },
+        get optionalActivities() { return ACTIVITIES.filter(a => a.type === 'optional'); },
 
-        get optionalActivities() {
-            return ACTIVITIES.filter(a => a.type === 'optional');
-        },
-
-        // Check if all mandatory activities are present in the grid
         get mandatoryComplete() {
             const usedIds = new Set(this.grid);
             return this.mandatoryActivities.every(a => usedIds.has(a.id));
@@ -267,44 +327,15 @@ document.addEventListener('alpine:init', () => {
             return this.grid.every(cell => cell !== null);
         },
 
-        get totalScreenTime() {
-            // Screen time is 'screen', maybe 'gaming' if added. PRD implies 'screen' items.
-            // Looking at ACTIVITIES, only 'screen' seems explicit, but 'gaming' might be 'other'?
-            // PRD says: "Pokud čas > 2h". 1 block = 0.5h.
-            // Let's count blocks with id 'screen'.
-            const blocks = this.grid.filter(id => id === 'screen').length;
-            return blocks * 0.5; // Hours
-        },
-
-        get statsByActivity() {
-            // Aggregate time per activity
-            const counts = {};
-            this.grid.forEach(id => {
-                if (id) counts[id] = (counts[id] || 0) + 0.5;
-            });
-            return Object.entries(counts)
-                .map(([id, hours]) => {
-                    const act = ACTIVITIES.find(a => a.id === id);
-                    return { ...act, hours, percent: (hours / 24) * 100 };
-                })
-                .sort((a, b) => b.hours - a.hours);
-        },
-
-        setDayType(type) {
-            if (confirm('Změna typu dne vymaže aktuální plán. Pokračovat?')) {
-                this.dayType = type;
-                this.grid = new Array(48).fill(null);
-                this.showResults = false;
-                this.saveState();
-            }
+        get totalPassiveScreenTime() {
+            return this.grid.filter(id => id === 'screen_passive').length * 0.5;
         },
 
         selectActivity(id) {
-            // Prevent selecting optional if mandatory not done
             const activity = ACTIVITIES.find(a => a.id === id);
-
+            // Allow optional only if mandatory done? user didn't complain, keeping logic.
             if (activity.type === 'optional' && !this.mandatoryComplete) {
-                alert('Nejdříve musíš naplánovat všechny povinné aktivity (škola, jídlo, spánek, hygiena)!');
+                alert('Nejdříve vyplň základní věci (Spánek, Škola, Jídlo).');
                 return;
             }
             this.selectedActivityId = id;
@@ -312,52 +343,33 @@ document.addEventListener('alpine:init', () => {
 
         toggleSlot(index) {
             if (!this.selectedActivityId) return;
-
-            // Simple toggle vs overwrite
-            // PRD says "Assign selected activity". 
-            // If dragging, we just overwrite.
             this.grid[index] = this.selectedActivityId;
             this.saveState();
         },
 
-        startDrag(index) {
-            this.isDragging = true;
-            this.toggleSlot(index);
-        },
-
-        onDragOver(index) {
-            if (this.isDragging) {
-                this.toggleSlot(index);
-            }
-        },
-
-        stopDrag() {
-            this.isDragging = false;
-        },
+        // Drag logic
+        startDrag(index) { this.isDragging = true; this.toggleSlot(index); },
+        onDragOver(index) { if (this.isDragging) this.toggleSlot(index); },
+        stopDrag() { this.isDragging = false; },
 
         getActivityColor(id) {
-            if (!id) return 'bg-white';
-            return ACTIVITIES.find(a => a.id === id)?.color || 'bg-gray-200';
+            return ACTIVITIES.find(a => a.id === id)?.color || 'bg-white';
+        },
+        getActivityIcon(id) {
+            return ACTIVITIES.find(a => a.id === id)?.icon || '';
         },
 
-        getActivityIcon(id) {
-            if (!id) return '';
-            return ACTIVITIES.find(a => a.id === id)?.icon || '';
+        formatTime(index) {
+            const totalMin = index * 30;
+            const h = Math.floor(totalMin / 60);
+            const m = totalMin % 60;
+            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
         },
 
         evaluateDay() {
             if (!this.isGridFull) return;
             this.showResults = true;
-            this.$dispatch('task-complete', { taskId: 2 });
-        },
-
-        formatTime(index) {
-            // Index 0 = 00:00, 1 = 00:30, etc.
-            const totalMin = index * 30;
-            const h = Math.floor(totalMin / 60);
-            const m = totalMin % 60;
-            return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+            this.$dispatch('module-complete', { moduleId: 2 });
         }
     }));
-
 });

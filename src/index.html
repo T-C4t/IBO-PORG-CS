@@ -9,9 +9,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Inter:wght@300;400;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -20,19 +18,7 @@
             theme: {
                 extend: {
                     fontFamily: {
-                        'child': ['Nunito', 'sans-serif'],
-                        'adult': ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        // Child Theme
-                        'child-yellow': '#FFD23F',
-                        'child-pink': '#EE4266',
-                        'child-green': '#3BCEAC',
-                        'child-blue': '#540D6E',
-                        // Adult Theme
-                        'adult-dark': '#0F172A',
-                        'adult-blue': '#3B82F6',
-                        'adult-slate': '#64748B',
+                        'sans': ['Inter', 'sans-serif'],
                     }
                 }
             }
@@ -51,596 +37,512 @@
             display: none !important;
         }
 
-        .bounce {
-            animation: bounce 2s infinite;
+        /* Custom scrollbar for planner */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
         }
 
-        @keyframes bounce {
-
-            0%,
-            20%,
-            50%,
-            80%,
-            100% {
-                transform: translateY(0);
-            }
-
-            40% {
-                transform: translateY(-20px);
-            }
-
-            60% {
-                transform: translateY(-10px);
-            }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
         }
 
-        /* Grid transitions */
-        .grid-cell {
-            transition: all 0.2s ease;
-        }
-
-        .grid-cell:hover {
-            transform: scale(1.05);
-            z-index: 10;
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background-color: #f1f5f9;
         }
     </style>
 </head>
 
 <body
-    class="antialiased h-screen overflow-hidden bg-gray-50 text-gray-800 selection:bg-yellow-200 selection:text-black">
+    class="antialiased h-screen overflow-hidden bg-slate-50 text-slate-800 selection:bg-indigo-100 selection:text-indigo-900 font-sans">
 
     <!-- App Container -->
-    <div x-data="app()" :class="{'font-child': ageMode === 'child', 'font-adult': ageMode === 'adult'}"
-        class="h-full w-full relative flex flex-col transition-all duration-500">
+    <div x-data="app()" class="h-full w-full relative flex flex-col">
 
-        <!-- Header / Navigation (Visible if not in Age Gate) -->
-        <header x-show="currentView !== 'age-gate'"
-            class="flex-none p-4 shadow-md z-50 flex justify-between items-center transition-colors duration-500"
-            :class="ageMode === 'child' ? 'bg-child-yellow' : 'bg-white border-b border-gray-200'">
-
-            <div class="flex items-center gap-2">
-                <span x-text="ageMode === 'child' ? '🛡️' : '🛡️'" class="text-2xl"></span>
-                <h1 class="text-xl font-bold"
-                    :class="ageMode === 'child' ? 'text-child-blue tracking-wide' : 'text-slate-800'">
-                    Bezpečně na Netu
-                </h1>
+        <!-- Header / Navigation -->
+        <header
+            class="flex-none bg-white border-b border-slate-200 px-6 py-4 flex justify-between items-center z-50 shadow-sm">
+            <div class="flex items-center gap-3">
+                <span class="text-2xl text-indigo-600">🛡️</span>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-800 leading-tight">Bezpečně na Netu</h1>
+                    <!-- <p class="text-xs text-slate-500 uppercase tracking-wider font-semibold">Educational Project</p> -->
+                </div>
             </div>
 
-            <div class="flex gap-4">
+            <div class="flex gap-3">
                 <button x-show="currentView !== 'menu'" @click="setView('menu')"
-                    class="px-4 py-2 rounded-full font-bold transition transform active:scale-95"
-                    :class="ageMode === 'child' ? 'bg-white text-child-pink shadow-lg hover:rotate-1' : 'text-slate-600 hover:bg-slate-100'">
-                    Zpět do menu
+                    class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-100 transition-colors border border-transparent hover:border-slate-200">
+                    ← Zpět
                 </button>
                 <button @click="resetApp()"
-                    class="px-4 py-2 rounded-full font-bold transition transform active:scale-95"
-                    :class="ageMode === 'child' ? 'bg-child-pink text-white shadow-lg hover:-rotate-1' : 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'">
-                    🔄 Začít znovu
+                    class="px-4 py-2 rounded-lg text-sm font-semibold text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                    title="Resetovat celý postup">
+                    Od začátku
                 </button>
             </div>
         </header>
 
         <!-- Dynamic Content Area -->
-        <main class="flex-grow overflow-auto relative w-full h-full">
+        <main class="flex-grow overflow-hidden relative w-full h-full">
 
-            <!-- VIEW: Age Gate -->
-            <div x-show="currentView === 'age-gate'" x-transition.opacity
-                class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
-
-                <h1 class="text-4xl md:text-6xl font-black mb-8 text-center text-indigo-900 drop-shadow-sm">
-                    Ahoj! 👋 <br class="md:hidden">Kolik ti je?
-                </h1>
-
-                <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl justify-center">
-                    <!-- Child Option -->
-                    <button @click="setAgeMode('child')"
-                        class="group flex-1 bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl border-4 border-transparent hover:border-child-yellow transition-all transform hover:-translate-y-2 text-center flex flex-col items-center gap-4">
-                        <span class="text-8xl group-hover:animate-bounce filter drop-shadow-md">🧒</span>
-                        <h2 class="text-3xl font-bold text-child-blue font-child">Méně než 15 let</h2>
-                        <span class="text-gray-500 font-child text-lg">Hravý režim pro tebe!</span>
-                    </button>
-
-                    <!-- Adult Option -->
-                    <button @click="setAgeMode('adult')"
-                        class="group flex-1 bg-slate-800 p-8 rounded-xl shadow-xl hover:shadow-2xl border-4 border-transparent hover:border-slate-600 transition-all transform hover:-translate-y-2 text-center flex flex-col items-center gap-4">
-                        <span class="text-8xl filter drop-shadow-md">🧑</span>
-                        <h2 class="text-3xl font-bold text-white font-adult">15 a více let</h2>
-                        <span class="text-slate-400 font-adult text-lg">Klasický režim</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- VIEW: Menu -->
+            <!-- VIEW: Menu / Dashboard -->
             <div x-show="currentView === 'menu'" x-transition:enter="transition ease-out duration-300"
                 x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
-                class="absolute inset-0 p-8 flex flex-col items-center justify-center gap-8"
-                :class="ageMode === 'child' ? 'bg-indigo-50 pattern' : 'bg-white'">
+                class="absolute inset-0 p-8 md:p-12 overflow-y-auto bg-slate-50">
 
-                <h2 class="text-3xl md:text-4xl font-bold text-center mb-4"
-                    :class="ageMode === 'child' ? 'text-child-blue' : 'text-slate-800'">
-                    Co chceš dělat?
-                </h2>
+                <div class="max-w-5xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-2">Vítej v kurzu</h2>
+                    <p class="text-lg text-slate-600 mb-10 max-w-2xl">
+                        Tento projekt ti pomůže zanalyzovat tvé digitální návyky a naučit se lépe reagovat na rizikové
+                        situace online.
+                        Pro získání finálního profilu projdi oba moduly.
+                    </p>
 
-                <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl h-full md:h-96"
-                    x-show="!(appStorage.task1Completed && appStorage.task2Completed)">
-                    <!-- Task 1 Card -->
-                    <button @click="setView('task-1')"
-                        class="relative flex-1 rounded-3xl p-8 text-left transition-all transform hover:scale-105 group overflow-hidden"
-                        :class="ageMode === 'child' ? 'bg-gradient-to-br from-child-green to-teal-400 text-white shadow-child-green/50 shadow-2xl' : 'bg-white border border-slate-200 shadow-xl hover:shadow-2xl'">
-                        <div
-                            class="absolute top-0 right-0 p-8 opacity-20 transform group-hover:scale-110 transition-transform text-9xl">
-                            💬</div>
-                        <h3 class="text-3xl font-bold mb-2">ÚKOL 1: Reakce</h3>
-                        <p class="text-lg opacity-90">Zvládneš náročné situace na sítích? Otestuj se v kvízu!</p>
-                        <div class="mt-8 inline-block px-6 py-3 rounded-full font-bold bg-white/20 backdrop-blur-sm">
-                            Spustit 🚀</div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                        <!-- Module 1 Card -->
+                        <button @click="setView('module-1')"
+                            class="group relative bg-white rounded-2xl p-8 text-left border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-300 transition-all duration-300 overflow-hidden">
+                            <div
+                                class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transform group-hover:scale-110 transition-all text-8xl text-indigo-900">
+                                💬
+                            </div>
 
-                        <!-- Progress Badge -->
-                        <div x-show="appStorage.task1Completed"
-                            class="absolute top-4 right-4 bg-white text-green-600 rounded-full p-2 shadow-sm">
-                            ✅ Hotovo
+                            <div class="relative z-10">
+                                <span
+                                    class="text-xs font-bold uppercase text-indigo-600 tracking-wider mb-2 block">Modul
+                                    1</span>
+                                <h3
+                                    class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-indigo-700 transition-colors">
+                                    Situace & Reakce</h3>
+                                <p class="text-slate-500 mb-6">Analyzuj rizikové scénáře (kyberšikana, privacy, doxing)
+                                    a vyber nejvhodnější strategii.</p>
+
+                                <div class="flex items-center gap-2 font-semibold"
+                                    :class="appStorage.module1Completed ? 'text-green-600' : 'text-indigo-600'">
+                                    <span
+                                        x-text="appStorage.module1Completed ? 'Hotovo ✓' : 'Spustit analýzu →'"></span>
+                                </div>
+                            </div>
+                        </button>
+
+                        <!-- Module 2 Card -->
+                        <button @click="setView('module-2')"
+                            class="group relative bg-white rounded-2xl p-8 text-left border border-slate-200 shadow-sm hover:shadow-xl hover:border-indigo-300 transition-all duration-300 overflow-hidden">
+                            <div
+                                class="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transform group-hover:scale-110 transition-all text-8xl text-indigo-900">
+                                📅
+                            </div>
+
+                            <div class="relative z-10">
+                                <span
+                                    class="text-xs font-bold uppercase text-indigo-600 tracking-wider mb-2 block">Modul
+                                    2</span>
+                                <h3
+                                    class="text-2xl font-bold text-slate-900 mb-3 group-hover:text-indigo-700 transition-colors">
+                                    Digitální Den</h3>
+                                <p class="text-slate-500 mb-6">Audit tvého běžného dne. Zjisti, jak technologie
+                                    ovlivňují tvůj spánek a regeneraci.</p>
+
+                                <div class="flex items-center gap-2 font-semibold"
+                                    :class="appStorage.module2Completed ? 'text-green-600' : 'text-indigo-600'">
+                                    <span x-text="appStorage.module2Completed ? 'Hotovo ✓' : 'Spustit audit →'"></span>
+                                </div>
+                            </div>
+                        </button>
+                    </div>
+
+                    <!-- Final Results Check -->
+                    <div x-show="appStorage.module1Completed && appStorage.module2Completed"
+                        class="bg-indigo-900 rounded-2xl p-8 text-white shadow-2xl flex flex-col md:flex-row items-center justify-between gap-6">
+                        <div>
+                            <h3 class="text-2xl font-bold mb-2">Kompetenční profil je připraven</h3>
+                            <p class="text-indigo-200">Analýza obou modulů byla dokončena. Podívej se na výsledky.</p>
                         </div>
-                    </button>
+                        <button @click="setView('final-results')"
+                            class="px-8 py-4 bg-white text-indigo-900 rounded-lg font-bold hover:bg-indigo-50 transition-colors shadow-lg whitespace-nowrap">
+                            Zobrazit profil
+                        </button>
+                    </div>
 
-                    <!-- Task 2 Card -->
-                    <button @click="setView('task-2')"
-                        class="relative flex-1 rounded-3xl p-8 text-left transition-all transform hover:scale-105 group overflow-hidden"
-                        :class="ageMode === 'child' ? 'bg-gradient-to-br from-child-pink to-rose-400 text-white shadow-child-pink/50 shadow-2xl' : 'bg-white border border-slate-200 shadow-xl hover:shadow-2xl'">
-                        <div
-                            class="absolute top-0 right-0 p-8 opacity-20 transform group-hover:scale-110 transition-transform text-9xl">
-                            📅</div>
-                        <h3 class="text-3xl font-bold mb-2">ÚKOL 2: Můj Den</h3>
-                        <p class="text-lg opacity-90">Naplánuj si svůj ideální den a zjisti, jak jsi na tom s časem u
-                            obrazovek.</p>
-                        <div class="mt-8 inline-block px-6 py-3 rounded-full font-bold bg-white/20 backdrop-blur-sm">
-                            Naplánovat ✏️</div>
-
-                        <!-- Progress Badge -->
-                        <div x-show="appStorage.task2Completed"
-                            class="absolute top-4 right-4 bg-white text-green-600 rounded-full p-2 shadow-sm">
-                            ✅ Hotovo
-                        </div>
-                    </button>
-                </div>
-
-                <!-- Final Results Call to Action (Visible when both done) -->
-                <div x-show="appStorage.task1Completed && appStorage.task2Completed"
-                    class="w-full max-w-3xl bg-white p-8 rounded-3xl shadow-2xl text-center flex flex-col items-center animate-bounce-in">
-                    <h3 class="text-3xl font-bold mb-4 text-slate-800">Oba úkoly jsou hotové! 🎉</h3>
-                    <p class="text-xl text-gray-600 mb-8">Podívej se na své celkové hodnocení.</p>
-                    <button @click="setView('final-results')"
-                        class="px-10 py-5 rounded-full text-2xl font-bold shadow-xl transition transform hover:scale-110"
-                        :class="ageMode === 'child' ? 'bg-child-blue text-white' : 'bg-blue-600 text-white'">
-                        Zobrazit vysvědčení 📜
-                    </button>
                 </div>
             </div>
 
-            <!-- VIEW: Task 1 (Quiz) -->
-            <div x-show="currentView === 'task-1'" x-data="quizStore()"
-                @task-complete.window="completeTask($event.detail.taskId)" x-cloak
-                class="absolute inset-0 p-4 md:p-8 overflow-y-auto"
-                :class="ageMode === 'child' ? 'bg-indigo-50' : 'bg-gray-50'">
+            <!-- VIEW: Module 1 (Situational Analysis) -->
+            <div x-show="currentView === 'module-1'" x-data="quizStore()"
+                @module-complete.window="completeModule($event.detail.moduleId)" x-cloak
+                class="absolute inset-0 bg-slate-50 overflow-y-auto p-4 md:p-8">
 
-                <div class="max-w-3xl mx-auto h-full flex flex-col justify-center">
-
-                    <!-- Progress Bar -->
-                    <div x-show="!showResults" class="w-full bg-gray-200 rounded-full h-4 mb-8 overflow-hidden">
-                        <div class="bg-green-500 h-4 rounded-full transition-all duration-500"
-                            :style="`width: ${progressPercentage}%`"></div>
+                <div class="max-w-4xl mx-auto h-full flex flex-col">
+                    <!-- Progress Header -->
+                    <div class="flex justify-between items-center mb-4 flex-none" x-show="!showResults">
+                        <span class="text-sm font-bold text-slate-400 uppercase tracking-widest">
+                            Případová studie <span x-text="currentScenarioIndex + 1"></span> / <span
+                                x-text="activeScenarios.length"></span>
+                        </span>
+                        <div class="w-32 h-2 bg-slate-200 rounded-full overflow-hidden">
+                            <div class="h-full bg-indigo-600 transition-all duration-300"
+                                :style="`width: ${progressPercentage}%`"></div>
+                        </div>
                     </div>
 
-                    <!-- SCENARIO CARD -->
-                    <div x-show="!showResults && scenario" x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="opacity-0 translate-x-10"
-                        x-transition:enter-end="opacity-100 translate-x-0"
-                        class="bg-white rounded-3xl shadow-xl overflow-hidden flex flex-col md:flex-row">
+                    <!-- Scenario Card -->
+                    <div x-show="!showResults && scenario" x-transition
+                        class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex-grow md:flex-none">
 
-                        <!-- Illustration/Icon Area -->
-                        <div class="md:w-1/3 p-8 flex items-center justify-center"
-                            :class="ageMode === 'child' ? 'bg-child-yellow' : 'bg-slate-100'">
-                            <!-- Dynamic icon based on scenario ID could go here, using generic for now -->
-                            <span class="text-9xl filter drop-shadow-lg"
-                                x-text="scenario.id === 'humor' ? '�' : (scenario.id === 'flirting' ? '🕵️' : '�')"></span>
+                        <div class="p-6 md:p-8 border-b border-slate-100 bg-slate-50/50">
+                            <div class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700 mb-4 uppercase tracking-wide"
+                                x-text="scenario.category"></div>
+                            <h2 class="text-2xl md:text-3xl font-bold text-slate-900 mb-4" x-text="scenario.title"></h2>
+                            <p class="text-lg text-slate-600 leading-relaxed" x-text="scenario.description"></p>
                         </div>
 
-                        <!-- Content Area -->
-                        <div class="p-8 md:w-2/3 flex flex-col justify-center">
-                            <span class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-2"
-                                x-text="`Situace ${currentScenarioIndex + 1} / 3`"></span>
-                            <h2 class="text-3xl font-bold mb-4" x-text="scenario.title"
-                                :class="ageMode === 'child' ? 'text-child-blue' : 'text-slate-800'"></h2>
-                            <p class="text-lg mb-8" x-text="scenario.description"></p>
-
-                            <!-- Options -->
+                        <div class="p-6 md:p-8 bg-white">
+                            <h3 class="text-sm font-bold text-slate-400 uppercase mb-4">Vyber jedno řešení:</h3>
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <template x-for="option in scenario.options">
                                     <button @click="selectAnswer(option)"
-                                        class="text-left p-3 rounded-xl border-2 transition-all transform hover:scale-[1.01] active:scale-95 flex flex-col justify-center min-h-[80px]"
-                                        :class="ageMode === 'child' 
-                                                ? 'border-indigo-100 hover:border-child-pink hover:bg-pink-50' 
-                                                : 'border-slate-200 hover:border-blue-500 hover:bg-slate-50'">
-                                        <span x-text="option.text" class="font-bold text-base leading-tight"></span>
+                                        class="text-left p-4 rounded-xl border border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all flex items-center justify-between group h-full">
+                                        <span x-text="option.text"
+                                            class="font-medium text-slate-700 group-hover:text-indigo-900"></span>
+                                        <span
+                                            class="opacity-0 group-hover:opacity-100 text-indigo-500 font-bold ml-2">→</span>
                                     </button>
                                 </template>
                             </div>
                         </div>
                     </div>
 
-                    <!-- RESULTS SUMMARY -->
-                    <div x-show="showResults" x-transition
-                        class="bg-white rounded-3xl shadow-2xl p-8 md:p-12 text-center max-w-2xl mx-auto">
-                        <div class="text-8xl mb-6">🎉</div>
-                        <h2 class="text-4xl font-bold mb-4"
-                            :class="ageMode === 'child' ? 'text-child-blue' : 'text-slate-800'">
-                            Máš to hotové!
-                        </h2>
-                        <p class="text-xl text-gray-600 mb-8">
-                            Prošel jsi všemi nástrahami. Jak jsi dopadl?
-                        </p>
+                    <!-- Immediate Feedback Overlay -->
+                    <div x-show="showFeedback"
+                        class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm"
+                        x-transition.opacity>
 
-                        <!-- Review List -->
-                        <div class="text-left space-y-4 mb-8">
-                            <template x-for="(ans, index) in answers">
-                                <div class="p-4 rounded-xl flex items-start gap-4"
-                                    :class="ans.type === 'ideal' ? 'bg-green-50 text-green-800' : 'bg-yellow-50 text-yellow-800'">
-                                    <span class="text-2xl" x-text="ans.type === 'ideal' ? '✅' : '⚠️'"></span>
-                                    <div>
-                                        <div class="font-bold text-sm opacity-70" x-text="SCENARIOS[index].title"></div>
-                                        <div x-text="ans.feedback"></div>
-                                    </div>
+                        <div class="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl transform transition-all"
+                            @click.outside="nextScenario()">
+
+                            <div class="flex items-center gap-4 mb-6">
+                                <div class="w-12 h-12 rounded-full flex items-center justify-center text-xl shrink-0"
+                                    :class="{
+                                        'bg-green-100 text-green-600': currentFeedbackBlock?.type === 'ideal',
+                                        'bg-yellow-100 text-yellow-600': currentFeedbackBlock?.type === 'ok',
+                                        'bg-red-100 text-red-600': currentFeedbackBlock?.type === 'bad'
+                                    }">
+                                    <span
+                                        x-text="currentFeedbackBlock?.type === 'ideal' ? '✓' : (currentFeedbackBlock?.type === 'bad' ? '!' : 'i')"></span>
                                 </div>
-                            </template>
-                        </div>
-
-                        <button @click="setView('menu')"
-                            class="px-8 py-4 rounded-full text-xl font-bold shadow-xl transition transform hover:scale-105"
-                            :class="ageMode === 'child' ? 'bg-child-green text-white' : 'bg-slate-800 text-white'">
-                            Pokračovat do Menu ➡️
-                        </button>
-                    </div>
-
-                </div>
-
-                <!-- FEEDBACK MODAL (Overlay) -->
-                <div x-show="showFeedback"
-                    class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-                    x-transition.opacity>
-
-                    <div @click.outside="nextScenario()"
-                        class="bg-white rounded-3xl p-8 md:p-10 max-w-lg w-full shadow-2xl transform transition-all"
-                        x-transition:enter="transition ease-out duration-300"
-                        x-transition:enter-start="scale-90 opacity-0" x-transition:enter-end="scale-100 opacity-100">
-
-                        <div class="text-center">
-                            <!-- Icon -->
-                            <div class="text-8xl mb-6 animate-bounce"
-                                x-text="currentFeedback?.type === 'ideal' ? '🌟' : (currentFeedback?.type === 'ok' ? '🤔' : '⚠️')">
+                                <h3 class="text-xl font-bold text-slate-900"
+                                    x-text="currentFeedbackBlock?.type === 'ideal' ? 'Doporučený postup' : (currentFeedbackBlock?.type === 'bad' ? 'Rizikové chování' : 'Akceptovatelné')">
+                                </h3>
                             </div>
 
-                            <!-- Title -->
-                            <h3 class="text-3xl font-bold mb-4" :class="{
-                                    'text-green-500': currentFeedback?.type === 'ideal',
-                                    'text-yellow-500': currentFeedback?.type === 'ok',
-                                    'text-red-500': currentFeedback?.type === 'bad'
-                                }">
-                                <span
-                                    x-text="currentFeedback?.type === 'ideal' ? 'Výborně!' : (currentFeedback?.type === 'ok' ? 'Dobře, ale...' : 'Pozor!')"></span>
-                            </h3>
-
-                            <!-- Feedback Text -->
-                            <p class="text-xl text-gray-700 mb-8" x-text="currentFeedback?.feedback"></p>
-
-                            <!-- Ideal Solution Hint (if wrong) -->
-                            <template x-if="currentFeedback?.type !== 'ideal'">
-                                <div class="bg-blue-50 p-4 rounded-xl text-left mb-8 border border-blue-100">
-                                    <div class="font-bold text-blue-800 flex items-center gap-2">
-                                        <span>💡</span> Správné řešení:
-                                    </div>
-                                    <div class="text-blue-700 text-sm mt-1">
-                                        <!-- Find the ideal option from the hidden scenario store is hard inside template. 
-                                             Better to use JS in 'currentFeedback' or helper. 
-                                             Simpler: show static hint or pre-calc.
-                                             We can use: get scenario().options.find(o => o.type === 'ideal').text
-                                        -->
-                                        <span x-text="scenario.options.find(o => o.type === 'ideal').text"></span>
-                                    </div>
-                                </div>
-                            </template>
+                            <p class="text-slate-600 mb-8 leading-relaxed" x-text="currentFeedbackBlock?.feedback"></p>
 
                             <button @click="nextScenario()"
-                                class="w-full py-4 rounded-xl text-xl font-bold transition transform active:scale-95 text-white shadow-lg"
-                                :class="{
-                                        'bg-green-500 hover:bg-green-600': currentFeedback?.type === 'ideal',
-                                        'bg-yellow-500 hover:bg-yellow-600': currentFeedback?.type === 'ok',
-                                        'bg-red-500 hover:bg-red-600': currentFeedback?.type === 'bad'
-                                    }">
-                                <span
-                                    x-text="(currentScenarioIndex < 2) ? 'Další otázka ➡️' : 'Zobrazit výsledky 🏁'"></span>
+                                class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors">
+                                Pokračovat
                             </button>
                         </div>
                     </div>
-                </div>
 
+                    <!-- Module 1 Completion -->
+                    <div x-show="showResults" class="text-center py-12 max-w-2xl mx-auto">
+                        <div
+                            class="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">
+                            ✓</div>
+                        <h2 class="text-3xl font-bold text-slate-900 mb-4">Analýza dokončena</h2>
+                        <p class="text-slate-600 mb-8">Tvé odpovědi byly zaznamenány do kompetenčního profilu.</p>
+                        <button @click="setView('menu')"
+                            class="px-8 py-3 bg-slate-900 text-white rounded-lg font-bold hover:bg-slate-800 transition-colors">
+                            Zpět na přehled
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <!-- VIEW: Task 2 (Planner) -->
-            <div x-show="currentView === 'task-2'" x-data="plannerStore()"
-                @task-complete.window="completeTask($event.detail.taskId)" @mouseup.window="stopDrag()" x-cloak
-                class="absolute inset-0 flex flex-col h-full bg-gray-50 overflow-hidden">
+            <!-- VIEW: Module 2 (Day Audit) -->
+            <div x-show="currentView === 'module-2'" x-data="plannerStore()"
+                @module-complete.window="completeModule($event.detail.moduleId)" @mouseup.window="stopDrag()" x-cloak
+                class="absolute inset-0 flex flex-col h-full bg-slate-50 overflow-hidden">
 
-                <!-- Top Bar: Day Type & Stats (Always visible) -->
-                <div class="flex-none bg-white p-4 shadow-sm z-20 flex flex-wrap gap-4 justify-between items-center">
-
-                    <!-- Day Type Switch -->
-                    <div class="flex bg-gray-100 rounded-lg p-1">
-                        <button @click="dayType === 'weekend' ? setDayType('weekday') : null"
-                            class="px-4 py-2 rounded-md font-bold text-sm transition-all"
-                            :class="dayType === 'weekday' ? 'bg-white shadow-md text-blue-600' : 'text-gray-400 hover:text-gray-600'">
-                            Všední den 🏫
-                        </button>
-                        <button @click="dayType === 'weekday' ? setDayType('weekend') : null"
-                            class="px-4 py-2 rounded-md font-bold text-sm transition-all"
-                            :class="dayType === 'weekend' ? 'bg-white shadow-md text-green-600' : 'text-gray-400 hover:text-gray-600'">
-                            Víkend 🌳
-                        </button>
-                    </div>
-
-                    <!-- Stats -->
-                    <div class="flex items-center gap-4 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
-                        <span class="text-2xl">📱</span>
-                        <div>
-                            <div class="text-xs font-bold uppercase text-gray-400">Screen Time</div>
-                            <div class="font-mono font-bold text-lg"
-                                :class="totalScreenTime > 2 ? 'text-red-500 animate-pulse' : 'text-green-600'">
-                                <span x-text="Math.floor(totalScreenTime)"></span>h
-                                <span x-text="(totalScreenTime % 1) * 60"></span>m
-                                <span class="text-gray-400 text-xs font-normal">/ max 2h</span>
-                            </div>
+                <!-- Audit Header -->
+                <div
+                    class="bg-white border-b border-slate-200 p-3 flex justify-between items-center shadow-sm z-10 flex-none">
+                    <div class="flex items-center gap-4">
+                        <h2 class="font-bold text-slate-800 hidden md:block">Digitální Den</h2>
+                        <div class="h-6 w-px bg-slate-200 hidden md:block"></div>
+                        <div class="text-xs text-slate-500">
+                            Vyplň svůj běžný den. <br class="md:hidden"> Nezapomeň na spánek!
                         </div>
                     </div>
 
-                    <!-- Main Action -->
-                    <button @click="evaluateDay()" :disabled="!isGridFull"
-                        class="px-6 py-3 rounded-full font-bold shadow-lg transition-all transform active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
-                        :class="isGridFull ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:scale-105' : 'bg-gray-200 text-gray-400'">
-                        <span x-text="isGridFull ? 'Vyhodnotit den ✅' : 'Vyplň celý den ⏳'"></span>
-                    </button>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right hidden sm:block">
+                            <div class="text-xs uppercase font-bold text-slate-400">Pasivní Screen Time</div>
+                            <div class="font-mono font-bold"
+                                :class="totalPassiveScreenTime > 2 ? 'text-orange-500' : 'text-green-600'">
+                                <span x-text="totalPassiveScreenTime"></span>h
+                            </div>
+                        </div>
+                        <button @click="evaluateDay()" :disabled="!isGridFull"
+                            class="px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-sm border border-transparent"
+                            :class="isGridFull ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md' : 'bg-slate-100 text-slate-400 cursor-not-allowed'">
+                            Dokončit audit
+                        </button>
+                    </div>
                 </div>
 
-                <!-- Main Workspace -->
                 <div class="flex-grow flex overflow-hidden">
-
-                    <!-- Palette Sidebar -->
+                    <!-- Sidebar Palette (Desktop) -->
                     <div
-                        class="w-1/3 md:w-1/4 lg:w-1/5 bg-white border-r border-gray-200 overflow-y-auto p-4 custom-scrollbar">
-                        <h3 class="font-bold text-gray-400 uppercase text-xs mb-4 sticky top-0 bg-white py-2 z-10">
-                            Aktivity</h3>
+                        class="w-64 bg-white border-r border-slate-200 overflow-y-auto p-4 custom-scrollbar hidden md:block flex-none">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Aktivity</h3>
 
-                        <!-- Mandatory -->
-                        <div class="mb-6">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-bold text-slate-700">Povinné</span>
-                                <span x-show="mandatoryComplete" class="text-xs text-green-500 font-bold">Hotovo
-                                    ✓</span>
-                            </div>
-                            <div class="grid grid-cols-1 gap-2">
-                                <template x-for="act in mandatoryActivities">
-                                    <button @click="selectActivity(act.id)"
-                                        class="flex items-center gap-2 p-2 rounded-lg border-2 text-left transition-all hover:translate-x-1"
-                                        :class="selectedActivityId === act.id ? 'border-black ring-2 ring-black/10' : 'border-transparent hover:bg-gray-50'">
-                                        <div class="w-8 h-8 rounded flex items-center justify-center text-xl shadow-sm"
-                                            :class="act.color" x-text="act.icon"></div>
-                                        <span class="font-bold text-sm" x-text="act.name"></span>
-                                    </button>
-                                </template>
-                            </div>
-                        </div>
-
-                        <!-- Optional -->
-                        <div>
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-sm font-bold text-slate-700">Volitelné</span>
-                                <span x-show="!mandatoryComplete" class="text-xs text-orange-500">Zamčeno 🔒</span>
-                            </div>
-                            <div class="grid grid-cols-1 gap-2"
-                                :class="mandatoryComplete ? '' : 'opacity-40 pointer-events-none grayscale'">
-                                <template x-for="act in optionalActivities">
-                                    <button @click="selectActivity(act.id)"
-                                        class="flex items-center gap-2 p-2 rounded-lg border-2 text-left transition-all hover:translate-x-1"
-                                        :class="selectedActivityId === act.id ? 'border-black ring-2 ring-black/10' : 'border-transparent hover:bg-gray-50'">
-                                        <div class="w-8 h-8 rounded flex items-center justify-center text-xl shadow-sm"
-                                            :class="act.color" x-text="act.icon"></div>
-                                        <span class="font-bold text-sm" x-text="act.name"></span>
-                                    </button>
-                                </template>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Grid Area -->
-                    <div class="flex-grow bg-gray-100 p-4 md:p-8 overflow-y-auto cursor-crosshair select-none relative">
-
-                        <!-- Mobile Helper -->
-                        <div class="md:hidden text-center text-xs text-gray-400 mb-2">Tážením prstem vyplníš více
-                            políček</div>
-
-                        <div
-                            class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1 md:gap-2 max-w-6xl mx-auto shadow-2xl bg-white p-4 rounded-xl">
-                            <template x-for="(cell, index) in grid">
-                                <div @mousedown="startDrag(index)" @mouseenter="onDragOver(index)"
-                                    class="aspect-square rounded md:rounded-lg border border-dashed border-gray-200 hover:border-blue-400 relative flex flex-col items-center justify-center transition-all bg-white overflow-hidden"
-                                    :class="cell ? 'border-solid border-transparent shadow-sm' : ''">
-
-                                    <!-- Time Label (Small) -->
-                                    <!-- Time Label (Small) -->
-                                    <span
-                                        class="absolute top-1 left-1 text-[9px] md:text-[11px] text-slate-400 font-bold pointer-events-none font-mono"
-                                        x-text="formatTime(index)"></span>
-
-                                    <!-- Filled Content -->
-                                    <div x-show="cell" class="w-full h-full flex flex-col items-center justify-center"
-                                        :class="getActivityColor(cell)">
-                                        <span class="text-2xl" x-text="getActivityIcon(cell)"></span>
-                                        <span
-                                            class="text-[8px] md:text-[10px] font-bold opacity-75 truncate w-full text-center px-1 hidden md:block"
-                                            x-text="ACTIVITIES.find(a => a.id === cell)?.name"></span>
-                                    </div>
-
-                                </div>
-                            </template>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- RESULTS OVERLAY -->
-                <div x-show="showResults" class="absolute inset-0 bg-white/95 backdrop-blur-md z-40 p-8 overflow-y-auto"
-                    x-transition:enter="transition ease-out duration-500" x-transition:enter-start="translate-y-full"
-                    x-transition:enter-end="translate-y-0">
-
-                    <div class="max-w-4xl mx-auto">
-                        <h2 class="text-4xl font-bold mb-8 text-center"
-                            :class="ageMode === 'child' ? 'text-child-blue' : 'text-slate-800'">
-                            Analýza tvého dne 📊
-                        </h2>
-
-                        <!-- Stats Cards -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                            <!-- Screen Time -->
-                            <div class="bg-gray-50 rounded-3xl p-8 border-2"
-                                :class="totalScreenTime > 2 ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'">
-                                <h3 class="text-gray-500 uppercase font-bold text-sm mb-2">Čas na síti</h3>
-                                <div class="text-5xl font-black mb-4"
-                                    :class="totalScreenTime > 2 ? 'text-red-500' : 'text-green-600'">
-                                    <span x-text="totalScreenTime"></span>h
-                                </div>
-                                <p class="text-lg">
-                                    <span x-show="totalScreenTime <= 2">🌟 Výborně! Vejdeš se do doporučeného limitu 2
-                                        hodin. Máš čas na spoustu super věcí!</span>
-                                    <span x-show="totalScreenTime > 2">⚠️ Pozor! Překračuješ doporučený limit 2 hodiny
-                                        denně. Zkus vyměnit mobil za knihu nebo sport. 💪</span>
-                                </p>
-                            </div>
-
-                            <!-- Distribution -->
-                            <div class="bg-white rounded-3xl p-8 shadow-lg">
-                                <h3 class="text-gray-500 uppercase font-bold text-sm mb-4">Co děláš nejvíce?</h3>
-                                <div class="space-y-3">
-                                    <template x-for="stat in statsByActivity.slice(0, 5)">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-8 text-xl text-center" x-text="stat.icon"></div>
-                                            <div class="flex-grow">
-                                                <div class="flex justify-between text-sm font-bold mb-1">
-                                                    <span x-text="stat.name"></span>
-                                                    <span x-text="stat.hours + 'h'"></span>
-                                                </div>
-                                                <div class="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                                    <div class="h-full rounded-full" :class="stat.color"
-                                                        :style="`width: ${stat.percent}%`"></div>
-                                                </div>
+                        <div class="space-y-6">
+                            <!-- Mandatory -->
+                            <div>
+                                <h4 class="text-xs font-semibold text-slate-900 mb-2 flex justify-between">
+                                    Základní potřeby
+                                    <span x-show="mandatoryComplete" class="text-green-500">✓</span>
+                                </h4>
+                                <div class="space-y-1">
+                                    <template x-for="act in mandatoryActivities">
+                                        <button @click="selectActivity(act.id)"
+                                            class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-slate-50 transition-colors border border-transparent"
+                                            :class="selectedActivityId === act.id ? 'bg-slate-50 border-indigo-500 ring-1 ring-indigo-500' : ''">
+                                            <div class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold border"
+                                                :class="act.color">
+                                                <span x-text="act.icon"></span>
                                             </div>
-                                        </div>
+                                            <span class="text-sm text-slate-700" x-text="act.name"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <!-- Optional -->
+                            <div :class="mandatoryComplete ? '' : 'opacity-40 pointer-events-none'">
+                                <h4 class="text-xs font-semibold text-slate-900 mb-2">Volný čas</h4>
+                                <div class="space-y-1">
+                                    <template x-for="act in optionalActivities">
+                                        <button @click="selectActivity(act.id)"
+                                            class="w-full flex items-center gap-3 p-2 rounded-md hover:bg-slate-50 transition-colors border border-transparent"
+                                            :class="selectedActivityId === act.id ? 'bg-slate-50 border-indigo-500 ring-1 ring-indigo-500' : ''">
+                                            <div class="w-6 h-6 rounded flex items-center justify-center text-xs font-bold border"
+                                                :class="act.color">
+                                                <span x-text="act.icon"></span>
+                                            </div>
+                                            <span class="text-sm text-slate-700" x-text="act.name"></span>
+                                        </button>
                                     </template>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="text-center">
-                            <button @click="setView('menu')"
-                                class="px-8 py-4 rounded-full text-xl font-bold shadow-xl transition transform hover:scale-105"
-                                :class="ageMode === 'child' ? 'bg-child-pink text-white' : 'bg-slate-800 text-white'">
-                                Zpět do menu 🏠
-                            </button>
+                    <!-- Main Grid Container -->
+                    <div class="flex-grow bg-slate-100 p-2 md:p-4 overflow-y-auto relative flex flex-col">
+
+                        <!-- Mobile Palette (Visible < MD) -->
+                        <div
+                            class="md:hidden w-full bg-white mb-2 rounded-lg shadow-sm p-2 flex gap-2 overflow-x-auto flex-none whitespace-nowrap">
+                            <template x-for="act in mandatoryActivities.concat(optionalActivities)">
+                                <button @click="selectActivity(act.id)"
+                                    class="inline-flex items-center gap-2 px-3 py-2 rounded-full border text-xs font-bold shrink-0"
+                                    :class="[act.color, selectedActivityId === act.id ? 'ring-2 ring-black' : '']">
+                                    <span x-text="act.icon"></span>
+                                    <span x-text="act.name"></span>
+                                </button>
+                            </template>
+                        </div>
+
+                        <!-- Grid itself -->
+                        <!-- FIX: Reduced padding and ensured container fits. Using flex-grow on container is good, but 
+                             if grid items are too tall, they will scroll. That's expected, but we want to minimize it.
+                             Reducing grid gap and container max-width. -->
+                        <div
+                            class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1 w-full max-w-6xl mx-auto bg-white p-3 rounded-xl shadow-sm border border-slate-200">
+                            <template x-for="(cell, index) in grid">
+                                <div @mousedown="startDrag(index)" @mouseenter="onDragOver(index)"
+                                    class="aspect-square relative border border-slate-100 hover:border-indigo-300 transition-colors cursor-pointer"
+                                    :class="cell ? '' : 'bg-slate-50'">
+
+                                    <span
+                                        class="absolute top-0 left-1 text-[9px] text-slate-300 font-mono pointer-events-none"
+                                        x-text="formatTime(index)" x-show="!cell"></span>
+
+                                    <div x-show="cell"
+                                        class="w-full h-full flex items-center justify-center text-sm font-bold border opacity-90"
+                                        :class="getActivityColor(cell)">
+                                        <span x-text="getActivityIcon(cell)"></span>
+                                    </div>
+                                </div>
+                            </template>
                         </div>
                     </div>
+                </div>
+
+                <!-- Module 2 Completion Overlay -->
+                <div x-show="showResults"
+                    class="absolute inset-0 bg-white z-50 flex flex-col items-center justify-center p-8">
+                    <h2 class="text-3xl font-bold text-slate-900 mb-4">Denní audit uložen</h2>
+                    <p class="text-slate-600 mb-8">Data o tvém spánku a času u obrazovky byla zpracována.</p>
+                    <button @click="setView('menu')"
+                        class="px-8 py-3 bg-indigo-600 text-white rounded-lg font-bold hover:bg-indigo-700 transition-colors">
+                        Pokračovat
+                    </button>
                 </div>
 
             </div>
 
-            <!-- VIEW: Final Results -->
+            <!-- VIEW: Final Results (Competency Profile) -->
             <div x-show="currentView === 'final-results'"
-                class="absolute inset-0 bg-white z-50 flex flex-col items-center justify-center p-8 overflow-hidden"
-                x-transition:enter="transition ease-out duration-500" x-transition:enter-start="opacity-0 scale-90"
-                x-transition:enter-end="opacity-100 scale-100">
+                class="absolute inset-0 bg-slate-50 z-50 overflow-y-auto p-4 md:p-12">
 
-                <!-- Confetti Background (Simulated with simple particles or just gradient) -->
-                <div class="absolute inset-0 opacity-10 pointer-events-none"
-                    :class="ageMode === 'child' ? 'bg-gradient-to-br from-yellow-300 via-pink-300 to-green-300' : 'bg-slate-100'">
-                </div>
-
-                <div class="relative z-10 max-w-2xl w-full text-center bg-white/80 backdrop-blur-xl rounded-3xl p-12 shadow-2xl border-4"
-                    :class="ageMode === 'child' ? 'border-child-yellow' : 'border-slate-200'">
-
-                    <h2 class="text-3xl font-bold uppercase tracking-widest text-gray-400 mb-4">Závěrečné hodnocení</h2>
-
-                    <!-- Grade Circle -->
-                    <div class="w-48 h-48 mx-auto rounded-full flex items-center justify-center mb-8 border-8 shadow-inner"
-                        :class="{
-                             'border-green-500 text-green-500 bg-green-50': ['A', 'B'].includes(grade),
-                             'border-yellow-500 text-yellow-500 bg-yellow-50': grade === 'C',
-                             'border-red-500 text-red-500 bg-red-50': ['D', 'F'].includes(grade)
-                         }">
-                        <span class="text-9xl font-black" x-text="grade"></span>
+                <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
+                    <div class="bg-indigo-900 p-8 text-white text-center">
+                        <h2 class="text-3xl font-bold mb-2">Kompetenční Profil</h2>
+                        <p class="text-indigo-200">Souhrn tvých digitálních návyků a postojů</p>
                     </div>
 
-                    <!-- Feedback Text -->
-                    <h3 class="text-2xl md:text-3xl font-bold mb-4" x-text="finalFeedback"
-                        :class="ageMode === 'child' ? 'text-child-blue' : 'text-slate-800'"></h3>
+                    <div class="p-8 md:p-12 space-y-12">
 
-                    <!-- Detailed Breakdown -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8 text-left">
-                        <!-- Task 1 Breakdown -->
-                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                            <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
-                                <span>💬</span> Úkol 1: Reakce
-                            </h4>
-                            <div class="space-y-1 text-sm">
-                                <div class="flex justify-between">
-                                    <span>🌟 Ideální řešení:</span>
-                                    <span class="font-bold text-green-600" x-text="quizBreakdown.ideal"></span>
+                        <!-- Skill Bars -->
+                        <div class="space-y-8">
+                            <!-- Safety -->
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <h3 class="font-bold text-slate-800">Digitální Bezpečnost a Ochrana Dat</h3>
+                                    <span class="font-mono font-bold text-indigo-600"
+                                        x-text="Math.round(profile.safety || 0) + '%'"></span>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span>🤔 Celkem dobré:</span>
-                                    <span class="font-bold text-yellow-600" x-text="quizBreakdown.ok"></span>
+                                <div class="h-4 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-indigo-500 rounded-full transition-all duration-1000"
+                                        :style="`width: ${profile.safety || 0}%`"></div>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span>⚠️ Nevhodné:</span>
-                                    <span class="font-bold text-red-600" x-text="quizBreakdown.bad"></span>
+                                <p class="text-sm text-slate-600 mt-2 bg-slate-50 p-4 rounded-lg border-l-4 border-indigo-500"
+                                    x-text="feedback.safety"></p>
+                            </div>
+
+                            <!-- Empathy -->
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <h3 class="font-bold text-slate-800">Sociální Interakce a Emoční Inteligence</h3>
+                                    <span class="font-mono font-bold text-indigo-600"
+                                        x-text="Math.round(profile.empathy || 0) + '%'"></span>
                                 </div>
+                                <div class="h-4 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-teal-500 rounded-full transition-all duration-1000"
+                                        :style="`width: ${profile.empathy || 0}%`"></div>
+                                </div>
+                                <p class="text-sm text-slate-600 mt-2 bg-slate-50 p-4 rounded-lg border-l-4 border-teal-500"
+                                    x-text="feedback.empathy"></p>
+                            </div>
+
+                            <!-- Wellbeing -->
+                            <div>
+                                <div class="flex justify-between mb-2">
+                                    <h3 class="font-bold text-slate-800">Digitální Wellbeing a Psychohygiena</h3>
+                                    <span class="font-mono font-bold text-indigo-600"
+                                        x-text="Math.round(profile.wellbeing || 0) + '%'"></span>
+                                </div>
+                                <div class="h-4 bg-slate-100 rounded-full overflow-hidden">
+                                    <div class="h-full bg-rose-500 rounded-full transition-all duration-1000"
+                                        :style="`width: ${profile.wellbeing || 0}%`"></div>
+                                </div>
+                                <p class="text-sm text-slate-600 mt-2 bg-slate-50 p-4 rounded-lg border-l-4 border-rose-500"
+                                    x-text="feedback.wellbeing"></p>
                             </div>
                         </div>
 
-                        <!-- Task 2 Breakdown -->
-                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100">
-                            <h4 class="font-bold text-slate-700 mb-2 flex items-center gap-2">
-                                <span>📅</span> Úkol 2: Můj Den
+
+
+                        <!-- Combined Analysis & Feedback -->
+                        <div class="bg-indigo-50/50 p-6 md:p-8 rounded-2xl border border-indigo-100 shadow-sm"
+                            x-show="(feedback.mistakes && feedback.mistakes.length > 0) || (feedback.tips && feedback.tips.length > 0)">
+
+                            <h4
+                                class="font-bold text-indigo-900 mb-6 uppercase text-sm tracking-wider flex items-center gap-2 border-b border-indigo-100 pb-2">
+                                <span>🔍</span> Podrobná analýza chyb a doporučení
                             </h4>
-                            <div class="space-y-1 text-sm">
-                                <div class="flex justify-between">
-                                    <span>📱 Čas u obrazovek:</span>
-                                    <span class="font-bold"
-                                        :class="plannerBreakdown.isOverLimit ? 'text-red-600' : 'text-green-600'">
-                                        <span x-text="plannerBreakdown.hours"></span>h
-                                    </span>
+
+                            <!-- Part 1: Mistakes (Module 1) -->
+                            <template x-if="feedback.mistakes && feedback.mistakes.length > 0">
+                                <div class="mb-8">
+                                    <h5
+                                        class="text-xs font-bold text-red-800/70 uppercase mb-3 flex items-center gap-2">
+                                        <span>⚠️</span> Tvé chyby v situacích (Modul 1)
+                                    </h5>
+                                    <div class="space-y-3">
+                                        <template x-for="mistake in feedback.mistakes">
+                                            <div class="bg-white p-4 rounded-xl shadow-sm border border-red-100/50">
+                                                <div class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1"
+                                                    x-text="mistake.question"></div>
+                                                <div class="font-medium text-slate-900 mb-2 flex items-start gap-2">
+                                                    <span class="text-red-500 mt-1 text-xs">❌</span>
+                                                    <span x-text="mistake.answer"
+                                                        class="text-red-700 font-semibold"></span>
+                                                </div>
+                                                <div
+                                                    class="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border-l-2 border-indigo-200">
+                                                    <span
+                                                        class="font-semibold text-indigo-900 block mb-1">Doporučení:</span>
+                                                    <span x-text="mistake.feedback"></span>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
                                 </div>
-                                <div class="flex justify-between">
-                                    <span>⚖️ Limit (2h):</span>
-                                    <span class="font-bold"
-                                        x-text="plannerBreakdown.isOverLimit ? 'Překročeno ❌' : 'Dodrženo ✅'"></span>
+                            </template>
+
+                            <!-- Part 2: Tips (Module 2 / General) -->
+                            <template x-if="feedback.tips && feedback.tips.length > 0">
+                                <div>
+                                    <h5
+                                        class="text-xs font-bold text-indigo-800/70 uppercase mb-3 flex items-center gap-2">
+                                        <span>💡</span> Tipy pro lepší wellbeing (Modul 2)
+                                    </h5>
+                                    <ul class="bg-white p-5 rounded-xl border border-indigo-100 space-y-3 shadow-sm">
+                                        <template x-for="tip in feedback.tips">
+                                            <li class="flex items-start gap-3 text-slate-700 text-sm">
+                                                <span class="text-green-500 mt-1">✓</span>
+                                                <span x-text="tip"></span>
+                                            </li>
+                                        </template>
+                                    </ul>
                                 </div>
-                            </div>
+                            </template>
                         </div>
+
+
+                        <!-- Task 2 Feedback (Planner) -->
+                        <div class="bg-blue-50 p-6 rounded-xl border border-blue-100" x-show="feedback.planner">
+                            <h4
+                                class="font-bold text-blue-900 mb-2 uppercase text-xs tracking-wider flex items-center gap-2">
+                                <span>📅</span> Hodnocení dne (Modul 2)
+                            </h4>
+                            <p class="text-slate-700 text-sm leading-relaxed" x-text="feedback.planner"></p>
+                        </div>
+
+                        <!-- Success Fallback (if no mistakes/tips) -->
+                        <div class="bg-green-50 p-6 rounded-xl border border-green-100 text-center"
+                            x-show="(!feedback.mistakes || feedback.mistakes.length === 0) && (!feedback.tips || feedback.tips.length === 0)">
+                            <span class="text-4xl block mb-2">🌟</span>
+                            <h4 class="font-bold text-green-900 mb-2">Fantastická práce!</h4>
+                            <p class="text-green-800 text-sm">Nenašli jsme žádné zásadní chyby. Jsi vzorem digitální
+                                bezpečnosti!</p>
+                        </div>
+
+                        <div class="text-center pt-8 border-t border-slate-100">
+                            <button @click="resetApp()"
+                                class="text-slate-500 hover:text-slate-800 font-semibold transition-colors text-sm">
+                                ↺ Resetovat a zkusit znovu
+                            </button>
+                        </div>
+
                     </div>
-
-                    <p class="text-gray-500 mb-8">Dokončil jsi oba úkoly. Doufáme, že ti workshop pomohl!</p>
-
-                    <!-- Restart -->
-                    <button @click="resetApp()"
-                        class="px-10 py-5 rounded-full text-xl font-bold transition transform hover:scale-105 shadow-xl"
-                        :class="ageMode === 'child' ? 'bg-child-blue text-white hover:bg-purple-800' : 'bg-slate-800 text-white hover:bg-slate-900'">
-                        🔄 Začít úplně znovu
-                    </button>
                 </div>
+
             </div>
 
         </main>
