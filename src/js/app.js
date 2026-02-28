@@ -73,17 +73,6 @@ document.addEventListener('alpine:init', () => {
             }
 
             this.saveState();
-
-            // Check if both are done
-            if (this.appStorage.task1Completed && this.appStorage.task2Completed) {
-                // Determine if we should show final results immediately or waiting for user
-                // For now, let's just make the view available or show a notification?
-                // PRD/Prompt implies automatic transition or availability. 
-                // Let's auto-transition if they are on a task view, or wait if menu.
-                // Actually prompt says "automatically appear or become available".
-                // Safest UX: Show a "Final Evaluation Ready" button in Menu, or redirect.
-                // Let's add a check in Menu view to show the "Final Result" button.
-            }
         },
 
         grade: null,
@@ -113,17 +102,17 @@ document.addEventListener('alpine:init', () => {
             };
 
             // Calculate Grade (0-5 points scale)
-            // Quiz: Max 3 points (based on ideal answers, but since we have 3 scenarios, it works)
+            // Quiz: Max 12 points (based on ideal answers, since we now have 12 scenarios)
             // Planner: Max 2 points if within limit
-            const quizPoints = Math.min(this.quizBreakdown.ideal, 3);
+            const quizPoints = Math.min(this.quizBreakdown.ideal, 12) * (5/12);
             const plannerPoints = this.plannerBreakdown.isOverLimit ? 0 : 2;
 
             const totalScore = quizPoints + plannerPoints;
 
-            if (totalScore >= 5) this.grade = 'A';
-            else if (totalScore === 4) this.grade = 'B';
-            else if (totalScore === 3) this.grade = 'C';
-            else if (totalScore === 2) this.grade = 'D';
+            if (totalScore >= 4.5) this.grade = 'A';
+            else if (totalScore >= 3.5) this.grade = 'B';
+            else if (totalScore >= 2.5) this.grade = 'C';
+            else if (totalScore >= 1.5) this.grade = 'D';
             else this.grade = 'F';
         },
 
@@ -147,33 +136,86 @@ document.addEventListener('alpine:init', () => {
         currentFeedback: null,
         answers: [], // Array to store user's result for each scenario
 
+        shuffledScenarios: [],
+        
         init() {
             // Load state if exists
             const saved = localStorage.getItem('bnn_quiz_state');
             if (saved) {
                 const parsed = JSON.parse(saved);
-                this.currentScenarioIndex = parsed.currentScenarioIndex;
+                this.currentScenarioIndex = parsed.currentScenarioIndex || 0;
                 this.answers = parsed.answers || [];
+                this.shuffledScenarios = parsed.shuffledScenarios || this.shuffleScenarios();
                 // If they were done, show results
                 if (this.currentScenarioIndex >= SCENARIOS.length) {
                     this.showResults = true;
                 }
+            } else {
+                // First time - shuffle scenarios
+                this.shuffledScenarios = this.shuffleScenarios();
             }
+        },
+        
+        shuffleScenarios() {
+            const shuffled = [...SCENARIOS];
+            // Fisher-Yates shuffle
+            for (let i = shuffled.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+            }
+            // Also shuffle options within each scenario
+            shuffled.forEach(scenario => {
+                const options = [...scenario.options];
+                for (let i = options.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [options[i], options[j]] = [options[j], options[i]];
+                }
+                scenario.options = options;
+            });
+            return shuffled;
         },
 
         get scenario() {
-            return SCENARIOS[this.currentScenarioIndex];
+            return this.shuffledScenarios[this.currentScenarioIndex] || SCENARIOS[this.currentScenarioIndex];
+        },
+        
+        get allScenarios() {
+            return this.shuffledScenarios.length > 0 ? this.shuffledScenarios : SCENARIOS;
+        },
+        
+        get totalScenarios() {
+            return this.allScenarios.length;
+        },
+
+        getScenarioIcon(id) {
+            const icons = {
+                'humor': '😄',
+                'flirting': '💕',
+                'comparison': '📊',
+                'cyberbullying': '💬',
+                'notifications': '🔔',
+                'wrong_content': '⚠️',
+                'strange_messages': '💭',
+                'shared_photo': '📷',
+                'someone_elses_bullying': '🤝',
+                'stranger_follow': '👤',
+                'friend_insult': '💔',
+                'scrolling_fatigue': '😴'
+            };
+            return icons[id] || '💡';
         },
 
         get progressPercentage() {
-            if (!SCENARIOS || SCENARIOS.length === 0) return 0;
-            return ((this.currentScenarioIndex) / SCENARIOS.length) * 100;
+            const scenarios = this.allScenarios;
+            if (!scenarios || scenarios.length === 0) return 0;
+            return ((this.currentScenarioIndex) / scenarios.length) * 100;
         },
 
         saveState() {
             localStorage.setItem('bnn_quiz_state', JSON.stringify({
                 currentScenarioIndex: this.currentScenarioIndex,
-                answers: this.answers
+                answers: this.answers,
+                shuffledScenarios: this.shuffledScenarios
             }));
         },
 
@@ -182,7 +224,6 @@ document.addEventListener('alpine:init', () => {
             this.showFeedback = true;
 
             // Save answer if not already saved for this index
-            // (Simpler logic: just push/update current index)
             this.answers[this.currentScenarioIndex] = option;
         },
 
@@ -191,7 +232,8 @@ document.addEventListener('alpine:init', () => {
             this.currentScenarioIndex++;
             this.saveState();
 
-            if (this.currentScenarioIndex >= SCENARIOS.length) {
+            const scenarios = this.allScenarios;
+            if (this.currentScenarioIndex >= scenarios.length) {
                 this.finishQuiz();
             }
         },
@@ -199,11 +241,6 @@ document.addEventListener('alpine:init', () => {
         finishQuiz() {
             this.showResults = true;
             // Notify global app that task 1 is done
-            // access parent scope event or store? 
-            // In Alpine, we can dispatch an event or access global store if injected.
-            // But here we rely on the DOM structure or just saving locally.
-            // Better: Dispatch custom event that 'app' listens to, or update appStorage directly if accessible.
-            // Since we are inside x-data, $dispatch is best.
             this.$dispatch('task-complete', { taskId: 1 });
         },
 
@@ -227,6 +264,7 @@ document.addEventListener('alpine:init', () => {
         dayType: 'weekday', // 'weekday' | 'weekend'
         grid: new Array(48).fill(null), // 48 blocks of 30 min
         selectedActivityId: null,
+        removeMode: false, // Mode for removing activities
         showResults: false,
         isDragging: false,
 
@@ -237,8 +275,6 @@ document.addEventListener('alpine:init', () => {
                 const parsed = JSON.parse(saved);
                 this.dayType = parsed.dayType || 'weekday';
                 this.grid = parsed.grid || new Array(48).fill(null);
-
-                // If grid is full and marked done, show results? Maybe not force it here.
             }
         },
 
@@ -250,17 +286,31 @@ document.addEventListener('alpine:init', () => {
         },
 
         get mandatoryActivities() {
+            // For weekend, school is not mandatory
+            if (this.dayType === 'weekend') {
+                return ACTIVITIES.filter(a => a.type === 'mandatory' && a.id !== 'school');
+            }
             return ACTIVITIES.filter(a => a.type === 'mandatory');
         },
-
+        
         get optionalActivities() {
+            // Add school to optional for weekend
+            if (this.dayType === 'weekend') {
+                const optional = ACTIVITIES.filter(a => a.type === 'optional');
+                const schoolActivity = ACTIVITIES.find(a => a.id === 'school');
+                if (schoolActivity) {
+                    return [...optional, { ...schoolActivity, type: 'optional', name: 'Škola (volitelně)' }];
+                }
+                return optional;
+            }
             return ACTIVITIES.filter(a => a.type === 'optional');
         },
 
         // Check if all mandatory activities are present in the grid
         get mandatoryComplete() {
-            const usedIds = new Set(this.grid);
-            return this.mandatoryActivities.every(a => usedIds.has(a.id));
+            const mandatoryIds = this.mandatoryActivities.map(a => a.id);
+            const usedIds = new Set(this.grid.filter(id => id !== null));
+            return mandatoryIds.every(id => usedIds.has(id));
         },
 
         get isGridFull() {
@@ -268,10 +318,7 @@ document.addEventListener('alpine:init', () => {
         },
 
         get totalScreenTime() {
-            // Screen time is 'screen', maybe 'gaming' if added. PRD implies 'screen' items.
-            // Looking at ACTIVITIES, only 'screen' seems explicit, but 'gaming' might be 'other'?
-            // PRD says: "Pokud čas > 2h". 1 block = 0.5h.
-            // Let's count blocks with id 'screen'.
+            // Screen time is 'screen'
             const blocks = this.grid.filter(id => id === 'screen').length;
             return blocks * 0.5; // Hours
         },
@@ -300,9 +347,20 @@ document.addEventListener('alpine:init', () => {
         },
 
         selectActivity(id) {
+            // Handle remove mode specially
+            if (id === 'remove') {
+                this.removeMode = !this.removeMode;
+                this.selectedActivityId = null;
+                return;
+            }
+            
             // Prevent selecting optional if mandatory not done
             const activity = ACTIVITIES.find(a => a.id === id);
-
+            if (!activity) return;
+            
+            // Clear remove mode when selecting an activity
+            this.removeMode = false;
+            
             if (activity.type === 'optional' && !this.mandatoryComplete) {
                 alert('Nejdříve musíš naplánovat všechny povinné aktivity (škola, jídlo, spánek, hygiena)!');
                 return;
@@ -311,11 +369,16 @@ document.addEventListener('alpine:init', () => {
         },
 
         toggleSlot(index) {
+            // If in remove mode, clear the slot
+            if (this.removeMode) {
+                this.grid[index] = null;
+                this.saveState();
+                return;
+            }
+            
             if (!this.selectedActivityId) return;
 
-            // Simple toggle vs overwrite
-            // PRD says "Assign selected activity". 
-            // If dragging, we just overwrite.
+            // Assign selected activity
             this.grid[index] = this.selectedActivityId;
             this.saveState();
         },

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bezpečně na Netu</title>
+    <title>DIGIFLOW</title>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -29,6 +29,11 @@
                         'child-pink': '#EE4266',
                         'child-green': '#3BCEAC',
                         'child-blue': '#540D6E',
+                        // MSVK Colors
+                        'msvk-light-red': '#E8D5D5',
+                        'msvk-dark-red': '#8B3A3A',
+                        'msvk-light-blue': '#D5E5F2',
+                        'msvk-dark-blue': '#1E4E79',
                         // Adult Theme
                         'adult-dark': '#0F172A',
                         'adult-blue': '#3B82F6',
@@ -41,6 +46,23 @@
 
     <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- Lucide Icons (UI icons) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        // Initialize Lucide icons
+        function initLucide() {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        }
+        
+        // Initialize on DOM ready
+        document.addEventListener('DOMContentLoaded', initLucide);
+        
+        // Re-initialize after Alpine.js updates the DOM
+    </script>
+
+    <!-- App Scripts -->
 
     <!-- App Scripts -->
     <script src="js/data.js"></script>
@@ -74,6 +96,55 @@
             }
         }
 
+        /* Wiggle animation for child mode */
+        .wiggle {
+            animation: wiggle 0.5s ease-in-out infinite;
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+
+        /* Float animation */
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Pulse glow for child mode */
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(238, 66, 102, 0.3); }
+            50% { box-shadow: 0 0 20px rgba(238, 66, 102, 0.6); }
+        }
+
+        /* Pop in animation */
+        .pop-in {
+            animation: pop-in 0.3s ease-out;
+        }
+
+        @keyframes pop-in {
+            0% { transform: scale(0); opacity: 0; }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Child mode playful background pattern */
+        .child-pattern {
+            background-image: 
+                radial-gradient(circle at 20% 80%, rgba(238, 66, 102, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(255, 210, 63, 0.1) 0%, transparent 30%);
+        }
+
         /* Grid transitions */
         .grid-cell {
             transition: all 0.2s ease;
@@ -82,6 +153,15 @@
         .grid-cell:hover {
             transform: scale(1.05);
             z-index: 10;
+        }
+
+        /* Child mode activity buttons hover */
+        .child-activity-btn:hover {
+            transform: scale(1.05) rotate(2deg);
+        }
+
+        .child-activity-btn:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
@@ -95,14 +175,13 @@
 
         <!-- Header / Navigation (Visible if not in Age Gate) -->
         <header x-show="currentView !== 'age-gate'"
-            class="flex-none p-4 shadow-md z-50 flex justify-between items-center transition-colors duration-500"
-            :class="ageMode === 'child' ? 'bg-child-yellow' : 'bg-white border-b border-gray-200'">
+            class="flex-none p-4 shadow-md z-50 flex justify-between items-center transition-colors duration-500 bg-white border-b border-gray-200">
 
-            <div class="flex items-center gap-2">
-                <span x-text="ageMode === 'child' ? '🛡️' : '🛡️'" class="text-2xl"></span>
-                <h1 class="text-xl font-bold"
-                    :class="ageMode === 'child' ? 'text-child-blue tracking-wide' : 'text-slate-800'">
-                    Bezpečně na Netu
+            <div class="flex items-center gap-3">
+                <!-- MSVK Logo -->
+                <img src="assets/logo.jpg" alt="MSVK" class="h-10 rounded">
+                <h1 class="text-xl font-bold text-msvk-dark-blue tracking-wide">
+                    DIGIFLOW
                 </h1>
             </div>
 
@@ -113,9 +192,9 @@
                     Zpět do menu
                 </button>
                 <button @click="resetApp()"
-                    class="px-4 py-2 rounded-full font-bold transition transform active:scale-95"
+                    class="flex items-center gap-2 px-4 py-2 rounded-full font-bold transition transform active:scale-95"
                     :class="ageMode === 'child' ? 'bg-child-pink text-white shadow-lg hover:-rotate-1' : 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'">
-                    🔄 Začít znovu
+                    <i data-lucide="rotate-ccw" class="w-4 h-4"></i> Začít znovu
                 </button>
             </div>
         </header>
@@ -125,28 +204,47 @@
 
             <!-- VIEW: Age Gate -->
             <div x-show="currentView === 'age-gate'" x-transition.opacity
-                class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+                class="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-msvk-light-blue to-indigo-50 p-6">
 
-                <h1 class="text-4xl md:text-6xl font-black mb-8 text-center text-indigo-900 drop-shadow-sm">
-                    Ahoj! 👋 <br class="md:hidden">Kolik ti je?
+                <!-- MSVK Logo at top -->
+                <div class="mb-6">
+                    <img src="assets/logo.jpg" alt="MSVK" class="h-20 md:h-24 rounded-lg shadow mx-auto block">
+                </div>
+
+                <h1 class="text-3xl md:text-5xl font-black mb-4 text-center text-msvk-dark-blue drop-shadow-sm">
+                    Vítejte!
                 </h1>
+
+                <p class="text-lg md:text-xl text-center text-gray-600 mb-6 max-w-2xl">
+                    Víte, jak reagovat na nepříjemné situace na sociálních sítích?<br>
+                    A kolik času věnujete každý den zábavě u obrazovek?<br><br>
+                    <strong>Pojďme se na to společně podívat!</strong>
+                </p>
+
+                <h2 class="text-xl md:text-2xl font-bold mb-8 text-center text-msvk-dark-blue">
+                    Zvolte prosím svůj věk:
+                </h2>
 
                 <div class="flex flex-col md:flex-row gap-8 w-full max-w-4xl justify-center">
                     <!-- Child Option -->
                     <button @click="setAgeMode('child')"
-                        class="group flex-1 bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl border-4 border-transparent hover:border-child-yellow transition-all transform hover:-translate-y-2 text-center flex flex-col items-center gap-4">
-                        <span class="text-8xl group-hover:animate-bounce filter drop-shadow-md">🧒</span>
-                        <h2 class="text-3xl font-bold text-child-blue font-child">Méně než 15 let</h2>
-                        <span class="text-gray-500 font-child text-lg">Hravý režim pro tebe!</span>
+                        class="group flex-1 bg-white p-8 rounded-3xl shadow-xl hover:shadow-2xl border-4 border-transparent hover:border-msvk-light-red transition-all transform hover:-translate-y-2 text-center flex flex-col items-center gap-4">
+                        <span class="text-8xl group-hover:animate-bounce filter drop-shadow-md">🌱</span>
+                        <h2 class="text-3xl font-bold text-msvk-dark-blue font-child">Méně než 15 let</h2>
                     </button>
 
                     <!-- Adult Option -->
                     <button @click="setAgeMode('adult')"
                         class="group flex-1 bg-slate-800 p-8 rounded-xl shadow-xl hover:shadow-2xl border-4 border-transparent hover:border-slate-600 transition-all transform hover:-translate-y-2 text-center flex flex-col items-center gap-4">
-                        <span class="text-8xl filter drop-shadow-md">🧑</span>
+                        <span class="text-8xl filter drop-shadow-md">🌳</span>
                         <h2 class="text-3xl font-bold text-white font-adult">15 a více let</h2>
-                        <span class="text-slate-400 font-adult text-lg">Klasický režim</span>
                     </button>
+                </div>
+
+                <!-- Footer with MSVK attribution -->
+                <div class="mt-12 text-center text-sm text-gray-500 px-4">
+                    <p>Tuto aplikaci pro vás připravili lektoři Moravskoslezské vědecké knihovny v Ostravě<br>
+                    ve spolupráci s lektorem a studenty Gymnázia PORG Ostrava.</p>
                 </div>
             </div>
 
@@ -157,8 +255,8 @@
                 :class="ageMode === 'child' ? 'bg-indigo-50 pattern' : 'bg-white'">
 
                 <h2 class="text-3xl md:text-4xl font-bold text-center mb-4"
-                    :class="ageMode === 'child' ? 'text-child-blue' : 'text-slate-800'">
-                    Co chceš dělat?
+                    :class="ageMode === 'child' ? 'text-msvk-dark-blue' : 'text-slate-800'">
+                    Čím začneme?
                 </h2>
 
                 <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl h-full md:h-96"
@@ -170,15 +268,15 @@
                         <div
                             class="absolute top-0 right-0 p-8 opacity-20 transform group-hover:scale-110 transition-transform text-9xl">
                             💬</div>
-                        <h3 class="text-3xl font-bold mb-2">ÚKOL 1: Reakce</h3>
-                        <p class="text-lg opacity-90">Zvládneš náročné situace na sítích? Otestuj se v kvízu!</p>
+                        <h3 class="text-3xl font-bold mb-2">KVÍZ</h3>
+                        <p class="text-lg opacity-90">Zvládnete náročné situace na sítích? Otestujte se v kvízu!</p>
                         <div class="mt-8 inline-block px-6 py-3 rounded-full font-bold bg-white/20 backdrop-blur-sm">
-                            Spustit 🚀</div>
+                            Spustit</div>
 
                         <!-- Progress Badge -->
                         <div x-show="appStorage.task1Completed"
-                            class="absolute top-4 right-4 bg-white text-green-600 rounded-full p-2 shadow-sm">
-                            ✅ Hotovo
+                            class="absolute top-4 right-4 flex items-center gap-1 bg-white text-green-600 rounded-full px-2 py-1 shadow-sm">
+                            <i data-lucide="check" class="w-4 h-4 text-green-500"></i> Hotovo
                         </div>
                     </button>
 
@@ -189,16 +287,15 @@
                         <div
                             class="absolute top-0 right-0 p-8 opacity-20 transform group-hover:scale-110 transition-transform text-9xl">
                             📅</div>
-                        <h3 class="text-3xl font-bold mb-2">ÚKOL 2: Můj Den</h3>
-                        <p class="text-lg opacity-90">Naplánuj si svůj ideální den a zjisti, jak jsi na tom s časem u
-                            obrazovek.</p>
+                        <h3 class="text-3xl font-bold mb-2">MŮJ DEN</h3>
+                        <p class="text-lg opacity-90">Zjistěte, kolik času trávíte zábavou u obrazovek.</p>
                         <div class="mt-8 inline-block px-6 py-3 rounded-full font-bold bg-white/20 backdrop-blur-sm">
-                            Naplánovat ✏️</div>
+                            Spustit</div>
 
                         <!-- Progress Badge -->
                         <div x-show="appStorage.task2Completed"
                             class="absolute top-4 right-4 bg-white text-green-600 rounded-full p-2 shadow-sm">
-                            ✅ Hotovo
+                            <i data-lucide="check" class="w-4 h-4 text-green-500"></i> Hotovo
                         </div>
                     </button>
                 </div>
@@ -241,13 +338,13 @@
                             :class="ageMode === 'child' ? 'bg-child-yellow' : 'bg-slate-100'">
                             <!-- Dynamic icon based on scenario ID could go here, using generic for now -->
                             <span class="text-9xl filter drop-shadow-lg"
-                                x-text="scenario.id === 'humor' ? '�' : (scenario.id === 'flirting' ? '🕵️' : '�')"></span>
+                                x-text="getScenarioIcon(scenario.id)"></span>
                         </div>
 
                         <!-- Content Area -->
                         <div class="p-8 md:w-2/3 flex flex-col justify-center">
                             <span class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-2"
-                                x-text="`Situace ${currentScenarioIndex + 1} / 3`"></span>
+                                x-text="`Situace ${currentScenarioIndex + 1} / ${totalScenarios}`"></span>
                             <h2 class="text-3xl font-bold mb-4" x-text="scenario.title"
                                 :class="ageMode === 'child' ? 'text-child-blue' : 'text-slate-800'"></h2>
                             <p class="text-lg mb-8" x-text="scenario.description"></p>
@@ -272,12 +369,9 @@
                         class="bg-white rounded-3xl shadow-2xl p-8 md:p-12 text-center max-w-2xl mx-auto">
                         <div class="text-8xl mb-6">🎉</div>
                         <h2 class="text-4xl font-bold mb-4"
-                            :class="ageMode === 'child' ? 'text-child-blue' : 'text-slate-800'">
-                            Máš to hotové!
+                            :class="ageMode === 'child' ? 'text-msvk-dark-blue' : 'text-slate-800'">
+                            Máte hotovo.<br>Jak to dopadlo?
                         </h2>
-                        <p class="text-xl text-gray-600 mb-8">
-                            Prošel jsi všemi nástrahami. Jak jsi dopadl?
-                        </p>
 
                         <!-- Review List -->
                         <div class="text-left space-y-4 mb-8">
@@ -294,9 +388,9 @@
                         </div>
 
                         <button @click="setView('menu')"
-                            class="px-8 py-4 rounded-full text-xl font-bold shadow-xl transition transform hover:scale-105"
+                            class="flex items-center gap-2 px-8 py-4 rounded-full text-xl font-bold shadow-xl transition transform hover:scale-105"
                             :class="ageMode === 'child' ? 'bg-child-green text-white' : 'bg-slate-800 text-white'">
-                            Pokračovat do Menu ➡️
+                            Pokračovat do Menu <i data-lucide="arrow-right" class="w-5 h-5"></i>
                         </button>
                     </div>
 
@@ -333,11 +427,11 @@
 
                             <!-- Ideal Solution Hint (if wrong) -->
                             <template x-if="currentFeedback?.type !== 'ideal'">
-                                <div class="bg-blue-50 p-4 rounded-xl text-left mb-8 border border-blue-100">
-                                    <div class="font-bold text-blue-800 flex items-center gap-2">
-                                        <span>💡</span> Správné řešení:
+                                <div class="bg-green-50 p-4 rounded-xl text-left mb-8 border border-green-100">
+                                    <div class="font-bold text-green-800 flex items-center gap-2">
+                                        <span>💡</span> Lepší řešení:
                                     </div>
-                                    <div class="text-blue-700 text-sm mt-1">
+                                    <div class="text-green-700 text-sm mt-1">
                                         <!-- Find the ideal option from the hidden scenario store is hard inside template. 
                                              Better to use JS in 'currentFeedback' or helper. 
                                              Simpler: show static hint or pre-calc.
@@ -352,11 +446,11 @@
                                 class="w-full py-4 rounded-xl text-xl font-bold transition transform active:scale-95 text-white shadow-lg"
                                 :class="{
                                         'bg-green-500 hover:bg-green-600': currentFeedback?.type === 'ideal',
-                                        'bg-yellow-500 hover:bg-yellow-600': currentFeedback?.type === 'ok',
-                                        'bg-red-500 hover:bg-red-600': currentFeedback?.type === 'bad'
+                                        'bg-blue-500 hover:bg-blue-600': currentFeedback?.type === 'ok',
+                                        'bg-orange-500 hover:bg-orange-600': currentFeedback?.type === 'bad'
                                     }">
                                 <span
-                                    x-text="(currentScenarioIndex < 2) ? 'Další otázka ➡️' : 'Zobrazit výsledky 🏁'"></span>
+                                    x-text="(currentScenarioIndex < totalScenarios - 1) ? 'Další otázka ➡️' : 'Zobrazit výsledky 🏁'"></span>
                             </button>
                         </div>
                     </div>
@@ -390,7 +484,7 @@
                     <div class="flex items-center gap-4 bg-gray-100 px-4 py-2 rounded-full border border-gray-200">
                         <span class="text-2xl">📱</span>
                         <div>
-                            <div class="text-xs font-bold uppercase text-gray-400">Screen Time</div>
+                            <div class="text-xs font-bold uppercase text-gray-400">Čas zábavy u obrazovek</div>
                             <div class="font-mono font-bold text-lg"
                                 :class="totalScreenTime > 2 ? 'text-red-500 animate-pulse' : 'text-green-600'">
                                 <span x-text="Math.floor(totalScreenTime)"></span>h
@@ -408,12 +502,25 @@
                     </button>
                 </div>
 
+                <!-- Instructions -->
+                <div class="bg-blue-50 px-4 py-2 text-sm text-blue-800 border-b border-blue-100">
+                    <strong>Návod:</strong> Nejprve vyberte všední nebo víkendový den. Poté přetahujte povinné položky z levého sloupce do časových oken. Po použití všech povinných ikon se odemknou volitelné ikonky. Kliknutím na "Mazat aktivitu" můžete smazat libovolnou buňku.
+                </div>
+
                 <!-- Main Workspace -->
                 <div class="flex-grow flex overflow-hidden">
 
                     <!-- Palette Sidebar -->
                     <div
                         class="w-1/3 md:w-1/4 lg:w-1/5 bg-white border-r border-gray-200 overflow-y-auto p-4 custom-scrollbar">
+                        
+                        <!-- Remove Mode Button -->
+                        <button @click="selectActivity('remove')"
+                            class="w-full mb-4 p-2 rounded-lg border-2 text-center transition-all font-bold text-sm"
+                            :class="removeMode ? 'border-red-500 bg-red-50 text-red-600' : 'border-gray-200 text-gray-500 hover:border-red-300'">
+                            <span x-text="removeMode ? '🛑 Mazání aktivní' : '🗑️ Mazat aktivitu'"></span>
+                        </button>
+                        
                         <h3 class="font-bold text-gray-400 uppercase text-xs mb-4 sticky top-0 bg-white py-2 z-10">
                             Aktivity</h3>
 
@@ -441,7 +548,7 @@
                         <div>
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-sm font-bold text-slate-700">Volitelné</span>
-                                <span x-show="!mandatoryComplete" class="text-xs text-orange-500">Zamčeno 🔒</span>
+                                <span x-show="!mandatoryComplete" class="text-xs text-orange-500"><i data-lucide="lock" class="w-3 h-3"></i> Zamčeno</span>
                             </div>
                             <div class="grid grid-cols-1 gap-2"
                                 :class="mandatoryComplete ? '' : 'opacity-40 pointer-events-none grayscale'">
@@ -468,9 +575,9 @@
                         <div
                             class="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-12 gap-1 md:gap-2 max-w-6xl mx-auto shadow-2xl bg-white p-4 rounded-xl">
                             <template x-for="(cell, index) in grid">
-                                <div @mousedown="startDrag(index)" @mouseenter="onDragOver(index)"
-                                    class="aspect-square rounded md:rounded-lg border border-dashed border-gray-200 hover:border-blue-400 relative flex flex-col items-center justify-center transition-all bg-white overflow-hidden"
-                                    :class="cell ? 'border-solid border-transparent shadow-sm' : ''">
+                                <div @mousedown="startDrag(index)" @mouseenter="onDragOver(index)" @click="removeMode ? toggleSlot(index) : null"
+                                    class="aspect-square rounded md:rounded-lg border border-dashed border-gray-200 hover:border-blue-400 relative flex flex-col items-center justify-center transition-all bg-white overflow-hidden cursor-pointer"
+                                    :class="cell ? 'border-solid border-transparent shadow-sm' : (removeMode ? 'hover:border-red-400' : '')">
 
                                     <!-- Time Label (Small) -->
                                     <!-- Time Label (Small) -->
@@ -500,8 +607,8 @@
 
                     <div class="max-w-4xl mx-auto">
                         <h2 class="text-4xl font-bold mb-8 text-center"
-                            :class="ageMode === 'child' ? 'text-child-blue' : 'text-slate-800'">
-                            Analýza tvého dne 📊
+                            :class="ageMode === 'child' ? 'text-msvk-dark-blue' : 'text-slate-800'">
+                            Analýza Vašeho dne 📊
                         </h2>
 
                         <!-- Stats Cards -->
@@ -509,22 +616,22 @@
                             <!-- Screen Time -->
                             <div class="bg-gray-50 rounded-3xl p-8 border-2"
                                 :class="totalScreenTime > 2 ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'">
-                                <h3 class="text-gray-500 uppercase font-bold text-sm mb-2">Čas na síti</h3>
+                                <h3 class="text-gray-500 uppercase font-bold text-sm mb-2">Čas zábavy u obrazovek</h3>
                                 <div class="text-5xl font-black mb-4"
                                     :class="totalScreenTime > 2 ? 'text-red-500' : 'text-green-600'">
                                     <span x-text="totalScreenTime"></span>h
                                 </div>
                                 <p class="text-lg">
-                                    <span x-show="totalScreenTime <= 2">🌟 Výborně! Vejdeš se do doporučeného limitu 2
-                                        hodin. Máš čas na spoustu super věcí!</span>
-                                    <span x-show="totalScreenTime > 2">⚠️ Pozor! Překračuješ doporučený limit 2 hodiny
-                                        denně. Zkus vyměnit mobil za knihu nebo sport. 💪</span>
+                                    <span x-show="totalScreenTime <= 2">Super! Netrávíš u obrazovek zbytečně moc času.
+                                        Odborníci doporučují trvat zábavou u obrazovek nanejvýš 2h denně.</span>
+                                    <span x-show="totalScreenTime > 2">Odborníci doporučují trvat zábavou u obrazovek nanejvýš 2h denně,
+                                        tuto hranici překračuješ. Zkus se víc bavit třeba čtením, tvořením, pohybem nebo setkáváním s přáteli.</span>
                                 </p>
                             </div>
 
                             <!-- Distribution -->
                             <div class="bg-white rounded-3xl p-8 shadow-lg">
-                                <h3 class="text-gray-500 uppercase font-bold text-sm mb-4">Co děláš nejvíce?</h3>
+                                <h3 class="text-gray-500 uppercase font-bold text-sm mb-4">Jak jste rozdělili čas:</h3>
                                 <div class="space-y-3">
                                     <template x-for="stat in statsByActivity.slice(0, 5)">
                                         <div class="flex items-center gap-3">
@@ -636,9 +743,9 @@
 
                     <!-- Restart -->
                     <button @click="resetApp()"
-                        class="px-10 py-5 rounded-full text-xl font-bold transition transform hover:scale-105 shadow-xl"
+                        class="flex items-center gap-2 px-10 py-5 rounded-full text-xl font-bold transition transform hover:scale-105 shadow-xl"
                         :class="ageMode === 'child' ? 'bg-child-blue text-white hover:bg-purple-800' : 'bg-slate-800 text-white hover:bg-slate-900'">
-                        🔄 Začít úplně znovu
+                        <i data-lucide="rotate-ccw" class="w-5 h-5"></i> Začít úplně znovu
                     </button>
                 </div>
             </div>
