@@ -1,0 +1,29 @@
+# Temporary files
+*.tmp
+*.temp
+*~
+
+# Screenshots
+*.png
+*.jpg
+*.jpeg
+*.gif
+!src/assets/*.jpg
+
+# Snapshots/memos
+*snapshot*.md
+*snapshot*.txt
+
+# Extracted text
+extracted_*.txt
+
+# Test files
+*-test.*
+*_test.*
+
+# AI agent files
+.sisyphus/
+
+# OS files
+.DS_Store
+Thumbs.db
