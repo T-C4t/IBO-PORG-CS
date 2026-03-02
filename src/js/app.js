@@ -17,6 +17,8 @@ document.addEventListener('alpine:init', () => {
         },
 
         init() {
+            // Always start at age gate
+            this.currentView = 'age-gate';
             // Load state from localStorage if available
             const savedState = localStorage.getItem('bnn_app_state');
             if (savedState) {
