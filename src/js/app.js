@@ -137,6 +137,7 @@ document.addEventListener('alpine:init', () => {
         showResults: false,
         currentFeedback: null,
         answers: [], // Array to store user's result for each scenario
+        selectedQuestionIndex: null, // For question detail modal
 
         shuffledScenarios: [],
         
@@ -250,12 +251,57 @@ document.addEventListener('alpine:init', () => {
             return this.answers.every(a => a.type === 'ideal');
         },
 
+        get idealCount() {
+            return this.answers.filter(a => a && a.type === 'ideal').length;
+        },
+
+        get totalPossible() {
+            return SCENARIOS.length;
+        },
+
         restartQuiz() {
             this.currentScenarioIndex = 0;
             this.answers = [];
             this.showResults = false;
             this.showFeedback = false;
             this.saveState();
+        },
+
+        // Question detail modal methods
+        openQuestionDetail(index) {
+            this.selectedQuestionIndex = index;
+        },
+
+        closeQuestionDetail() {
+            this.selectedQuestionIndex = null;
+        },
+
+        // Get the scenario at a specific index
+        getScenarioAt(index) {
+            return this.shuffledScenarios[index] || SCENARIOS[index];
+        },
+
+        // Get the user's answer at a specific index
+        getUserAnswerAt(index) {
+            return this.answers[index];
+        },
+
+        // Get the ideal answer for a scenario
+        getIdealAnswer(scenario) {
+            if (!scenario || !scenario.options) return null;
+            return scenario.options.find(o => o.type === 'ideal') || null;
+        },
+
+        // Get full detail for a question at index
+        getQuestionDetail(index) {
+            const scenario = this.getScenarioAt(index);
+            const userAnswer = this.getUserAnswerAt(index);
+            const idealAnswer = this.getIdealAnswer(scenario);
+            return {
+                scenario,
+                userAnswer,
+                idealAnswer
+            };
         }
     }));
 
@@ -378,13 +424,18 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
             
+            // If no activity selected, do nothing
             if (!this.selectedActivityId) return;
-
-            // Assign selected activity
+            
+        // If clicking same cell with same activity, remove it (toggle off)
+            if (this.grid[index] === this.selectedActivityId) {
+                this.grid[index] = null;
+                this.saveState();
+                return;
+            }
             this.grid[index] = this.selectedActivityId;
             this.saveState();
         },
-
         startDrag(index) {
             this.isDragging = true;
             this.toggleSlot(index);
