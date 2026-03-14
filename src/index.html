@@ -259,8 +259,7 @@
                     Čím začneme?
                 </h2>
 
-                <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl h-full md:h-96"
-                    x-show="!(appStorage.task1Completed && appStorage.task2Completed)">
+                <div class="flex flex-col md:flex-row gap-8 w-full max-w-5xl h-full md:h-96">
                     <!-- Task 1 Card -->
                     <button @click="setView('task-1')"
                         class="relative flex-1 rounded-3xl p-8 text-left transition-all transform hover:scale-105 group overflow-hidden"
@@ -380,9 +379,7 @@
                         <button @click="setView('menu')"
                             class="flex items-center gap-2 px-8 py-4 rounded-full text-xl font-bold shadow-xl transition transform hover:scale-105"
                             :class="ageMode === 'child' ? 'bg-child-green text-white' : 'bg-slate-800 text-white'">
-                            Pokračovat do Menu <i data-lucide="arrow-right" class="w-5 h-5"></i>
-                        </button>
-                    </div>
+                        </div>
 
                 </div>
 
@@ -446,6 +443,15 @@
                     </div>
                 </div>
 
+            </div>
+
+            <!-- Menu Button (outside scroll area, fixed at bottom) -->
+            <div x-show="showResults" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50">
+                <button @click="setView('menu')"
+                    class="flex items-center gap-2 px-8 py-4 rounded-full text-xl font-bold shadow-2xl transition transform hover:scale-105"
+                    :class="ageMode === 'child' ? 'bg-child-green text-white' : 'bg-slate-800 text-white'">
+                    Pokračovat do Menu <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                </button>
             </div>
 
             <!-- VIEW: Task 2 (Planner) -->
