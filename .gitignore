@@ -21,8 +21,17 @@ extracted_*.txt
 *-test.*
 *_test.*
 
-# AI agent files
+# AI agent files (OpenCode/Sisyphus)
 .sisyphus/
+.opencode/
+.opencode-session/
+.opencode-cache/
+.opencode-logs/
+.opencode-tmp/
+opencode.json
+AGENTS.md
+CLAUDE.md
+.claude/
 
 # OS files
 .DS_Store
