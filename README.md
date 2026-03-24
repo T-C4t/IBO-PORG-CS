@@ -1,106 +1,58 @@
 # Bezpečně na Netu
 
-Interaktivní vzdělávací webová aplikace pro výuku bezpečného chování na internetu. Aplikace je určena pro workshopy v knihovnách a školách.
+Webová aplikace pro výuku bezpečného chování na internetu, určená pro workshopy v knihovnách a školách.
 
-## 📋 Popis projektu
+## Co to je
 
-**Bezpečně na Netu** je interaktivní webová aplikace, která učí děti a dospívající bezpečnému chování na internetu. Aplikace se přizpůsobuje věku uživatele a nabízí dvě hlavní aktivity:
+Aplikace učí děti a dospívající, jak se chovat na internetu. Má dvě části:
 
-- **Úkol 1: Reakce na situace** – Scénářové kvízy zaměřené na správné reakce v rizikových situacích na sociálních sítích (kyberšikana, cizí lidé online, ochrana hesel)
-- **Úkol 2: Můj Den** – Nástroj pro plánování dne a analýzu času stráveného u obrazovek
+- **Reakce na situace** – scénářové kvízy o kyberšikaně, cizích lidech online a ochraně hesel
+- **Můj Den** – plánovač dne s analýzou času u obrazovek
 
-## 🎯 Cílová skupina
+Podle věku uživatele se mění vzhled: děti (11–14) vidí hravý barevný design, dospívající (15+) dostanou střízlivější verzi.
 
-| Věková skupina | Režim aplikace |
-|----------------|----------------|
-| 11–14 let | Dětský režim (hravý, barevný, s emoji) |
-| 15+ let | Dospělý režim (profesionálnější design) |
+## Jak to funguje
 
-## 🚀 Funkce
+Uživatel projde oběma úkoly. V prvním reaguje na scénáře – po každé odpovědi dostane okamžitou zpětnou vazbu. Ve druhém vyplňuje časovou mřížku dne (48 bloků po 30 minutách), kde přiřazuje aktivity jako spánek, škola nebo obrazovky. Systém dopočítá čas u obrazovek a vyhodnotí, jestli uživatel překročil doporučený limit (2 hodiny pro mladší 14 let).
 
-### Age Gate (Věková brána)
-- Na začátku aplikace uživatel vybere, zda je mladší 14 let
-- Podle výběru se změní vizuální styl celé aplikace
+## Technologie
 
-### Hlavní menu
-- Přehled dvou úkolů s indikací dokončení
-- Možnost resetovat aplikaci a začít znovu
+Nic se neinstaluje. Běží to na CDN závislostech:
 
-### Úkol 1: Kvízové scénáře
-- 3 interaktivní scénáře rizikových situací
-- Okamžitá zpětná vazba po každé odpovědi
-- Souhrn výsledků na konci
+- Tailwind CSS
+- Alpine.js
+- Google Fonts (Nunito pro děti, Inter pro dospělé)
+- Lucide Icons
 
-### Úkol 2: Plánovač dne
-- 48 bloků representujících 24 hodin (1 blok = 30 minut)
-- Povinné aktivity: Spánek, Jídlo, Škola/Práce, Hygiena
-- Volitelné aktivity: Pohyb, Tvoření, Čtení, Obrazovky a další
-- Real-time statistika času u obrazovek
-- Vyhodnocení s doporučeními
+Potřebuje internetové připojení.
 
-## 🛠️ Technologie
-
-- **HTML5** – Semantická struktura
-- **Tailwind CSS** – Stylování (via CDN)
-- **Alpine.js** – Interaktivita a správa stavu (via CDN)
-- **Google Fonts** – Fredoka (dětský režim), Inter (dospělý režim)
-
-## 📁 Struktura projektu
+## Struktura
 
 ```
-IBO-PORG-CS/
-├── src/
-│   ├── index.html       # Hlavní HTML soubor aplikace
-│   ├── js/
-│   │   └── app.js       # Logika aplikace (volitelné)
-│   └── assets/          # Statické assety
-├── docs/
-│   ├── PRD.md           # Product Requirements Document
-│   └── stav_aplikace.md # Aktuální stav aplikace
-└── archive/
-    ├── dev-prompts/     # Interní vývojové prompty
-    └── old-deliverables/ # Starší verze dokumentů
+src/
+├── index.html       # Hlavní soubor – veškeré UI a logika
+├── js/
+│   ├── app.js       # Stav aplikace, výpočty
+│   └── data.js      # Scénáře a aktivity (data pro kvíz a plánovač)
+└── assets/
+    └── logo.jpg
 ```
 
-## 💻 Spuštění aplikace
+Pro změnu obsahu se upravuje `js/data.js` (pole `SCENARIOS` a `ACTIVITIES`). Pro změnu vzhledu `index.html` (Tailwind třídy). Pro změnu chování `app.js`.
 
-### Varianta 1: Přímé otevření
-Otevřete soubor `src/index.html` v libovolném moderním prohlížeči.
+## Spuštění
 
-### Varianta 2: Lokální vývojový server
+Otevřít `src/index.html` v prohlížeči. Hotovo.
+
+Pro lokální server:
 ```bash
-cd src
-python -m http.server 8000
-# nebo
-npx serve .
+cd src && python -m http.server 8000
 ```
-Poté otevřete http://localhost:8000 v prohlížeči.
 
-## 🔧 Vývoj
+## Soukromí
 
-Aplikace nevyžaduje žádnou instalaci závislostí. Stačí:
-1. Klonovat repository
-2. Otevřít `src/index.html` v prohlížeči
-3. Pro úpravy použít libovolný textový editor
-
-## 📝 Obsah dat
-
-Scénáře a aktivity jsou definovány přímo v kódu v `src/index.html`. Pro úpravu obsahu:
-- Vyhledejte sekci `x-data` v HTML souboru
-- Upravte pole `scenarios` pro Úkol 1
-- Upvelte pole `activities` pro Úkol 2
-
-## 🔒 Soukromí a GDPR
-
-- Aplikace **neukládá** žádné osobní údaje uživatelů
-- Data se ukládají pouze lokálně v prohlížeči (localStorage)
-- Není nutná registrace ani přihlášení
-- Aplikace je plně GDPR compliant
-
-## 📞 Kontakt
-
-Pro více informací kontaktujte tým projektu nebo navštivte webové stránky Vědecké knihovny Ostrava.
+Neukládá žádná osobní data. Všechno jde do localStorage v prohlížeči, nikam se nic neposílá. Není potřeba registrace ani přihlášení.
 
 ---
 
-*Vytvořeno jako vzdělávací nástroj pro knihovny a školy.*
+*Pro Vědeckou knihovnu Ostrava.*
