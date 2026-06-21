@@ -9,6 +9,7 @@
 *.jpeg
 *.gif
 !src/assets/*.jpg
+!src/assets/*.png
 
 # Snapshots/memos
 *snapshot*.md
@@ -36,3 +37,6 @@ CLAUDE.md
 # OS files
 .DS_Store
 Thumbs.db
+
+# Editor (local)
+.vscode/
